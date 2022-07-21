@@ -2,6 +2,7 @@
 BifurcationKit = "0f109fa4-8a5d-4b75-95aa-f515264e7665"
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+GraphRecipes = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
 JumpProcesses = "ccbc3e58-028d-4f4c-8cd5-9ae44345cda5"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
