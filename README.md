@@ -1,11 +1,16 @@
-# JuliaCon2022_Catalyst_Workshop
-Start julia in the root folder and 
+# JuliaCon 2022 Catalyst Workshop
+This repo contains the notebooks used in the workshop. They can be installed and used to follow along as follows:
+
+1. Click the green code button on Github and download the package to your computer.
+2. Start Julia in the downloaded folder.
+3. Enter
 ```julia
 using Pkg
 Pkg.activate(".")
+Pkg.instantiate()
 using Pluto
 Pluto.run()
 ```
-then you can load any tutorial!
+4. At this point Pluto should open in your web browser, and you can load any of the workshop notebooks.
 
-Note, these tutorials were made for JuliaCon 2022 and use Catalyst 12.1.2.
+Note, these tutorials use Catalyst 12.1.2.
