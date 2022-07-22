@@ -21,6 +21,13 @@ using Distributions: Geometric
 # ╔═╡ 192af62c-08fc-11ed-35a9-bb2a5d18c32f
 html"<button onclick=present()>Present</button>"
 
+# ╔═╡ 45e2c3e6-ffc6-48d3-af95-320f19a0f5d6
+html"""<style>
+main {
+    max-width: 900px;
+}
+"""
+
 # ╔═╡ 7cb53ff0-1751-4940-a4b3-bec68e81a005
 html"""
 <script>
@@ -107,7 +114,7 @@ begin
 end
 
 # ╔═╡ dbfd836f-d475-48e7-9afd-8f02d9785f42
-md"## _*Symbolic Modeling Features of Catalyst.jl*_
+md"# Symbolic Modeling Features of Catalyst.jl
 Catalyst offers a lot of additional functionality that can be exploited by using the underlying ModelingToolkit.jl and Symbolics.jl CAS features:
 - Building networks symbolically and programmatically
     - Interpolation into the DSL
@@ -673,6 +680,7 @@ md"Let's set some default initial values for the voltage and gating variables."
 
 # ╔═╡ Cell order:
 # ╟─192af62c-08fc-11ed-35a9-bb2a5d18c32f
+# ╟─45e2c3e6-ffc6-48d3-af95-320f19a0f5d6
 # ╟─7cb53ff0-1751-4940-a4b3-bec68e81a005
 # ╟─32897144-3033-45bb-a878-f72f6882df20
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
