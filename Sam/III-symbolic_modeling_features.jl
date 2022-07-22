@@ -686,7 +686,7 @@ md"Let's set some default initial values for the voltage and gating variables."
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
 # ╠═3177b2e3-eefd-4faf-b292-2c7c6f0bbe22
 # ╠═d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
-# ╟─dbfd836f-d475-48e7-9afd-8f02d9785f42
+# ╠═dbfd836f-d475-48e7-9afd-8f02d9785f42
 # ╟─e63ce294-4e50-4fec-8092-8f34facfd7f5
 # ╠═6c8e9c23-eca9-4b91-8391-8eefeb3b3745
 # ╟─0c4f8cd6-b05e-4386-956f-9eaa404ab656
