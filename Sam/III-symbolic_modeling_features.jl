@@ -161,10 +161,10 @@ md"We next define our state variables, the species populations"
 md"We have now constructed [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl) symbolic parameters and variables we can manipulate in Julia using [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl):"
 
 # ╔═╡ 8ff33d17-902c-44bb-ba24-9e89c06fb887
-ex = (X^2 - 2*X + 1)^2 / (X-1)
+ex = (X^2 - 2*X + 1) / (X-1)
 
 # ╔═╡ d9393282-8389-43af-8ab9-f9d9f3943cad
-ex2 = simplify_fractions(ex)
+ex2 = simplify(ex)
 
 # ╔═╡ bf439579-ab39-4e3e-9c1d-0d71ac7d8b9e
 substitute(ex2, Dict((X-1) => Y))
@@ -562,34 +562,30 @@ The transition rate functions, which depend on the voltage, ``V(t)``, are then
 "
 
 # ╔═╡ 1b16a199-ffae-45e5-8528-21f05c4d3432
-function αₘ(V) 
+begin 
+	function αₘ(V) 
 		theta = (V + 45) / 10
 		IfElse.ifelse(theta == 0.0, 1.0, theta/(1 - exp(-theta)))
+	end
+	βₘ(V) = 4*exp(-(V + 70)/18)
+	
+	αₕ(V) = .07 * exp(-(V + 70)/20)
+	βₕ(V) = 1/(1 + exp(-(V + 40)/10))
+	
+	function αₙ(V)
+		theta = (V + 60) / 10
+		IfElse.ifelse(theta == 0.0, .1, .1*theta / (1 - exp(-theta)))
+	end
+	βₙ(V) = .125 * exp(-(V + 70)/80)
 end
-
-# ╔═╡ 56daecea-5e52-4426-927b-9c5230c49cc3
-βₘ(V) = 4*exp(-(V + 70)/18)
-
-# ╔═╡ dd7a1232-326c-4027-99f8-dd9a8d2f46a9
-αₕ(V) = .07 * exp(-(V + 70)/20)
-
-# ╔═╡ 4c12edef-9043-45e2-b5dc-860b221c6074
-βₕ(V) = 1/(1 + exp(-(V + 40)/10))
-
-# ╔═╡ af5d4e09-80e6-4e00-b2c4-2494a6a70c52
-function αₙ(V)
-	theta = (V + 60) / 10
-	IfElse.ifelse(theta == 0.0, .1, .1*theta / (1 - exp(-theta)))
-end
-
-# ╔═╡ 76184a12-9061-4c77-83aa-7a7187544ffa
-βₙ(V) = .125 * exp(-(V + 70)/80)
 
 # ╔═╡ 10c8bca1-7f9f-457e-a19f-fc60d358317c
 md"
 - We now declare the symbolic variable, `V(t)`, that will represent voltage.
 - We tell Catalyst not to generate an equation for it from the reactions we list, using the `isbcspecies` metadata. 
 - This label tells Catalyst an ODE or nonlinear equation for `V(t)` will be provided in a constraint system.
+
+Aside: `bcspecies` means a boundary condition species, a terminology from SBML.
 "
 
 # ╔═╡ 5390f023-b554-43be-b4f7-1738a3a2cab3
@@ -609,14 +605,15 @@ md"Next we create a `ModelingToolkit.ODESystem` to store the equation for `dV/dt
 voltageode = let
 	@parameters C=1.0 ḡNa=120.0 ḡK=36.0 ḡL=.3 ENa=45.0 EK=-82.0 EL=-59.0 I₀=0.0
 	@variables m(t) n(t) h(t)
-	Dₜ = Differential(t)
 	I = I₀* sin(2*pi*t/30)^2 
+
+	Dₜ = Differential(t)
 	eqs = [Dₜ(V) ~ -1/C * (ḡK*n^4*(V-EK) + ḡNa*m^3*h*(V-ENa) + ḡL*(V-EL)) + I/C]
 	@named voltageode = ODESystem(eqs, t)
 end
 
 # ╔═╡ 07537b15-68e7-4642-8e8c-d5001b564101
-md"Notice, we included an applied current, `I`, that we will use to perturb the system and create action potentials. For now we turn this off by setting its amplitude, `I₀` to zero.
+md"Notice, we included an applied current, `I`, that we will use to perturb the system and create action potentials. For now we turn this off by setting its amplitude, `I₀`, to zero.
 
 
 Finally, we couple this ODE into the reaction model as a constraint system:"
@@ -649,11 +646,11 @@ md"Finally, starting from this resting state let's solve the system when the amp
 
 # ╔═╡ b16c5e12-32ac-4e40-8185-35efb1221b50
 let
-	tspan = (0.0, 40.0)
+	tspan = (0.0, 50.0)
 	@unpack I₀ = hhmodel
 	oprob = ODEProblem(hhmodel, u_ss, tspan, [I₀ => 10.0])
 	sol = solve(oprob)
-	plot(sol, vars=V, legend=:bottomright)
+	plot(sol, vars=V, legend=:outerright)
 end
 
 # ╔═╡ 7a065cca-ffac-47cb-bc29-c00237d6936a
@@ -676,8 +673,8 @@ md"Let's set some default initial values for the voltage and gating variables."
 
 # ╔═╡ Cell order:
 # ╟─192af62c-08fc-11ed-35a9-bb2a5d18c32f
-# ╠═7cb53ff0-1751-4940-a4b3-bec68e81a005
-# ╠═32897144-3033-45bb-a878-f72f6882df20
+# ╟─7cb53ff0-1751-4940-a4b3-bec68e81a005
+# ╟─32897144-3033-45bb-a878-f72f6882df20
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
 # ╠═3177b2e3-eefd-4faf-b292-2c7c6f0bbe22
 # ╠═d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
@@ -771,13 +768,8 @@ md"Let's set some default initial values for the voltage and gating variables."
 # ╠═ee7afe3c-4989-4dd5-8706-a9ee523a36b7
 # ╟─095a5aff-4aa9-4138-bec5-0f8ee5d37399
 # ╠═9329d5b9-d9f3-4bbf-a6de-24cea133ccbb
-# ╠═88350aaf-530d-49ef-a2d2-c1ce2eeb226a
+# ╟─88350aaf-530d-49ef-a2d2-c1ce2eeb226a
 # ╠═1b16a199-ffae-45e5-8528-21f05c4d3432
-# ╠═56daecea-5e52-4426-927b-9c5230c49cc3
-# ╠═dd7a1232-326c-4027-99f8-dd9a8d2f46a9
-# ╠═4c12edef-9043-45e2-b5dc-860b221c6074
-# ╠═af5d4e09-80e6-4e00-b2c4-2494a6a70c52
-# ╠═76184a12-9061-4c77-83aa-7a7187544ffa
 # ╟─10c8bca1-7f9f-457e-a19f-fc60d358317c
 # ╠═5390f023-b554-43be-b4f7-1738a3a2cab3
 # ╠═fea64be0-3d41-4714-8690-fbd5df42c246
