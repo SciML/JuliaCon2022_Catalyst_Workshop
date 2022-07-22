@@ -90,6 +90,22 @@ md"
 # ╔═╡ 146fee58-6588-4bfc-94d9-cfa7302b59a0
 md"Package setup:"
 
+# ╔═╡ d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
+# plot defaults
+begin
+	_fsz = 12
+	_tsz = 12
+	default(size=(800,400), 
+			xtickfontsize=_tsz,
+			ytickfontsize=_tsz,
+		    titlefontsize=_fsz,
+	     	xguidefontsize=_fsz, 
+		    yguidefontsize=_fsz,
+		    legendfontsize=_fsz,
+	        margin=5Plots.mm,
+	        lw=2);
+end
+
 # ╔═╡ dbfd836f-d475-48e7-9afd-8f02d9785f42
 md"## _*Symbolic Modeling Features of Catalyst.jl*_
 Catalyst offers a lot of additional functionality that can be exploited by using the underlying ModelingToolkit.jl and Symbolics.jl CAS features:
@@ -364,7 +380,8 @@ md"fails. If we register it though it will be usable:"
 
 # ╔═╡ 771e0080-a6d4-4de8-a7ec-3bb3949fc57f
 let 
-	import Base: round
+	# this is needed to define a version of it for symbolic variables
+	import Base: round   
 	@parameters b
 	@register_symbolic round(x)
 	round(b)
@@ -527,12 +544,21 @@ let
 end
 
 # ╔═╡ 88350aaf-530d-49ef-a2d2-c1ce2eeb226a
-md"## _*Constraint Equations*_
+md"## _*Application: Hodgkin-Huxley Equation as a Constraint ODE*_
 - In many applications one may want to have coupled ODEs or algebraic equations associated with a chemical reaction network. 
 - These can be used in Catalyst via constraint systems.
 - Constraint systems can be ModelingToolkit `ODESystem`s or `NonlinearSystem`s.
 
 For example, let's build a simple Hodgkin-Huxley model for a single neuron, with the voltage, `V(t)`, included as a constraint `ODESystem`.
+
+We first specify the transition rates for the three gating variables, ``m(t)``, ``n(t)``, and ``h(t)`` 
+```math
+s' \xleftrightarrow[\beta_s(V(t))]{\alpha_s(V(t))} s, \quad s \in \{m,n,h\}
+```
+where 
+- ``m``, ``n``, and ``h``, are gating variables that determine the fraction of active (open) or inactive (``m' = 1 - m``, ``n' = 1 -n``, ``h' = 1 - h``) receptors.
+
+The transition rate functions, which depend on the voltage, ``V(t)``, are then
 "
 
 # ╔═╡ 1b16a199-ffae-45e5-8528-21f05c4d3432
@@ -559,44 +585,56 @@ end
 # ╔═╡ 76184a12-9061-4c77-83aa-7a7187544ffa
 βₙ(V) = .125 * exp(-(V + 70)/80)
 
+# ╔═╡ 10c8bca1-7f9f-457e-a19f-fc60d358317c
+md"
+- We now declare the symbolic variable, `V(t)`, that will represent voltage.
+- We tell Catalyst not to generate an equation for it from the reactions we list, using the `isbcspecies` metadata. 
+- This label tells Catalyst an ODE or nonlinear equation for `V(t)` will be provided in a constraint system.
+"
+
 # ╔═╡ 5390f023-b554-43be-b4f7-1738a3a2cab3
 @variables V(t) [isbcspecies=true]
 
 # ╔═╡ fea64be0-3d41-4714-8690-fbd5df42c246
 hhrn = @reaction_network hhmodel begin
-	(αₙ($V),βₙ($V)), noff <--> n
-	(αₘ($V),βₘ($V)), moff <--> m
-	(αₕ($V),βₕ($V)), hoff <--> h
+	(αₙ($V),βₙ($V)), n′ <--> n
+	(αₘ($V),βₘ($V)), m′ <--> m
+	(αₕ($V),βₕ($V)), h′ <--> h
 end
 
-# ╔═╡ 1ca7e462-e55b-49d9-88c6-1ec319b00ba6
-let
-	V₀ = -70
-	setdefaults!(hhrn, [:noff => βₙ(V₀)/(αₙ(V₀)+βₙ(V₀)), :n => αₙ(V₀)/(αₙ(V₀)+βₙ(V₀)),
-				    	:moff => βₘ(V₀)/(αₘ(V₀)+βₘ(V₀)), :m => αₘ(V₀)/(αₘ(V₀)+βₘ(V₀)),
-						:hoff => βₕ(V₀)/(αₕ(V₀)+βₕ(V₀)), :h => αₕ(V₀)/(αₕ(V₀)+βₕ(V₀)),
-						:V => V₀])
-end
+# ╔═╡ b87af1c6-02b6-4981-9da4-c850c25d10eb
+md"Next we create a `ModelingToolkit.ODESystem` to store the equation for `dV/dt`"
 
 # ╔═╡ 0aa27dc1-8331-4d6a-8cf7-b15c91300458
 voltageode = let
-	@parameters C=1.0 ḡNa=120 ḡK=36 ḡL=.3 ENa=45 EK=-82 EL=-59
+	@parameters C=1.0 ḡNa=120.0 ḡK=36.0 ḡL=.3 ENa=45.0 EK=-82.0 EL=-59.0 I₀=0.0
 	@variables m(t) n(t) h(t)
 	Dₜ = Differential(t)
-	eqs = [Dₜ(V) ~ -1/C * (ḡK*n^4*(V-EK) + ḡNa*m^3*h*(V-ENa) + ḡL*(V-EL))]
+	I = I₀* sin(2*pi*t/30)^2 
+	eqs = [Dₜ(V) ~ -1/C * (ḡK*n^4*(V-EK) + ḡNa*m^3*h*(V-ENa) + ḡL*(V-EL)) + I/C]
 	@named voltageode = ODESystem(eqs, t)
 end
+
+# ╔═╡ 07537b15-68e7-4642-8e8c-d5001b564101
+md"Notice, we included an applied current, `I`, that we will use to perturb the system and create action potentials. For now we turn this off by setting its amplitude, `I₀` to zero.
+
+
+Finally, we couple this ODE into the reaction model as a constraint system:"
 
 # ╔═╡ 2ff15451-de82-4547-abdd-c22fc498d352
 @named hhmodel = extend(voltageode, hhrn)
 
 # ╔═╡ f7cdaa82-9343-4b0e-a7b1-139109961951
-md"Let's first solve to steady-state to get the resting voltage."
+md"
+- `hhmodel` is now a `ReactionSystem` that is coupled to an internal constraint `ODESystem` that stores `dV/dt`. 
+- Let's now solve to steady-state, as we can then use these resting values as an initial condition before applying a current to create an action potential."
 
 # ╔═╡ 0c2af32c-70fc-4ed9-9673-601dc4191f24
 hhsssol = let
 	tspan = (0.0, 50.0)
-	oprob = ODEProblem(hhmodel, [], tspan)
+	u₀ = [:V => -70, :m => 0.0, :h => 0.0, :n => 0.0, 
+		  :m′ => 1.0, :n′ => 1.0, :h′ => 1.0]
+	oprob = ODEProblem(hhmodel, u₀, tspan)
 	sol = solve(oprob, Rosenbrock23())	
 end
 
@@ -604,39 +642,45 @@ end
 plot(hhsssol, vars=V)
 
 # ╔═╡ b05cfc61-e815-4684-8014-bda19c9aef0e
-u0 = hhsssol.u[end]
+u_ss = hhsssol.u[end]
 
-# ╔═╡ 2c7a0908-a35a-44af-992a-13dbec0104b6
-
+# ╔═╡ e9232601-8b28-4e4c-abc0-dc5a8c46b7f4
+md"Finally, starting from this resting state let's solve the system when the amplitude of the stimulus is non-zero and see if we get action potentials"
 
 # ╔═╡ b16c5e12-32ac-4e40-8185-35efb1221b50
-
+let
+	tspan = (0.0, 40.0)
+	@unpack I₀ = hhmodel
+	oprob = ODEProblem(hhmodel, u_ss, tspan, [I₀ => 10.0])
+	sol = solve(oprob)
+	plot(sol, vars=V, legend=:bottomright)
+end
 
 # ╔═╡ 7a065cca-ffac-47cb-bc29-c00237d6936a
 md"## _*Appendix*_"
 
-# ╔═╡ 0bbeb157-ebc7-4c99-aa1d-0adbeeb0f27f
-# plot defaults
-begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
-end
+# ╔═╡ 34a4ecb6-c5ec-4b18-ad98-51769d5e8a0a
+md"Let's set some default initial values for the voltage and gating variables."
+
+# ╔═╡ 322c1baf-eaee-4342-a097-6206c95cb7c7
+# let
+# 	V₀ = -70
+# 	setdefaults!(hhrn, [:noff => βₙ(V₀)/(αₙ(V₀)+βₙ(V₀)), :n => αₙ(V₀)/(αₙ(V₀)+βₙ(V₀)),
+# 				    	:moff => βₘ(V₀)/(αₘ(V₀)+βₘ(V₀)), :m => αₘ(V₀)/(αₘ(V₀)+βₘ(V₀)),
+# 						:hoff => βₕ(V₀)/(αₕ(V₀)+βₕ(V₀)), :h => αₕ(V₀)/(αₕ(V₀)+βₕ(V₀)),
+# 						:V => V₀])
+# end
+
+# ╔═╡ a812e534-9df6-477d-9bf4-afba5aa4a45c
+
 
 # ╔═╡ Cell order:
 # ╟─192af62c-08fc-11ed-35a9-bb2a5d18c32f
-# ╟─7cb53ff0-1751-4940-a4b3-bec68e81a005
-# ╟─32897144-3033-45bb-a878-f72f6882df20
+# ╠═7cb53ff0-1751-4940-a4b3-bec68e81a005
+# ╠═32897144-3033-45bb-a878-f72f6882df20
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
 # ╠═3177b2e3-eefd-4faf-b292-2c7c6f0bbe22
+# ╠═d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
 # ╟─dbfd836f-d475-48e7-9afd-8f02d9785f42
 # ╟─e63ce294-4e50-4fec-8092-8f34facfd7f5
 # ╠═6c8e9c23-eca9-4b91-8391-8eefeb3b3745
@@ -727,23 +771,27 @@ end
 # ╠═ee7afe3c-4989-4dd5-8706-a9ee523a36b7
 # ╟─095a5aff-4aa9-4138-bec5-0f8ee5d37399
 # ╠═9329d5b9-d9f3-4bbf-a6de-24cea133ccbb
-# ╟─88350aaf-530d-49ef-a2d2-c1ce2eeb226a
+# ╠═88350aaf-530d-49ef-a2d2-c1ce2eeb226a
 # ╠═1b16a199-ffae-45e5-8528-21f05c4d3432
 # ╠═56daecea-5e52-4426-927b-9c5230c49cc3
 # ╠═dd7a1232-326c-4027-99f8-dd9a8d2f46a9
 # ╠═4c12edef-9043-45e2-b5dc-860b221c6074
 # ╠═af5d4e09-80e6-4e00-b2c4-2494a6a70c52
 # ╠═76184a12-9061-4c77-83aa-7a7187544ffa
+# ╟─10c8bca1-7f9f-457e-a19f-fc60d358317c
 # ╠═5390f023-b554-43be-b4f7-1738a3a2cab3
 # ╠═fea64be0-3d41-4714-8690-fbd5df42c246
-# ╠═1ca7e462-e55b-49d9-88c6-1ec319b00ba6
+# ╟─b87af1c6-02b6-4981-9da4-c850c25d10eb
 # ╠═0aa27dc1-8331-4d6a-8cf7-b15c91300458
+# ╟─07537b15-68e7-4642-8e8c-d5001b564101
 # ╠═2ff15451-de82-4547-abdd-c22fc498d352
 # ╟─f7cdaa82-9343-4b0e-a7b1-139109961951
 # ╠═0c2af32c-70fc-4ed9-9673-601dc4191f24
 # ╠═7bcb71ea-5c83-4680-804e-79d2754d7b91
 # ╠═b05cfc61-e815-4684-8014-bda19c9aef0e
-# ╠═2c7a0908-a35a-44af-992a-13dbec0104b6
+# ╟─e9232601-8b28-4e4c-abc0-dc5a8c46b7f4
 # ╠═b16c5e12-32ac-4e40-8185-35efb1221b50
 # ╟─7a065cca-ffac-47cb-bc29-c00237d6936a
-# ╠═0bbeb157-ebc7-4c99-aa1d-0adbeeb0f27f
+# ╟─34a4ecb6-c5ec-4b18-ad98-51769d5e8a0a
+# ╠═322c1baf-eaee-4342-a097-6206c95cb7c7
+# ╠═a812e534-9df6-477d-9bf4-afba5aa4a45c
