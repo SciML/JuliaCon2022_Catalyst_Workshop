@@ -626,7 +626,7 @@ md"Notice, we included an applied current, `I`, that we will use to perturb the 
 Finally, we couple this ODE into the reaction model as a constraint system:"
 
 # ╔═╡ 2ff15451-de82-4547-abdd-c22fc498d352
-@named hhmodel = extend(voltageode, hhrn)
+@named hhmodel = extend(voltageode, hhrn);
 
 # ╔═╡ f7cdaa82-9343-4b0e-a7b1-139109961951
 md"
@@ -640,7 +640,7 @@ hhsssol = let
 		  :m′ => 1.0, :n′ => 1.0, :h′ => 1.0]
 	oprob = ODEProblem(hhmodel, u₀, tspan)
 	sol = solve(oprob, Rosenbrock23())	
-end
+end;
 
 # ╔═╡ 7bcb71ea-5c83-4680-804e-79d2754d7b91
 plot(hhsssol, vars=V)

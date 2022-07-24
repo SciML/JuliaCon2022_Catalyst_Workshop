@@ -110,9 +110,9 @@ end
 # ╔═╡ 1e81937b-b71d-48a7-bdce-1a3f612c35be
 md"# What's going on under the hood?
 Let's look at what happens when we create various problem types, like `ODEProblem`, from a Catalyst reaction model. We'll focus on
-- Default reaction rate laws and combinatoric scalings.
-- ModelingToolkit systems.
-- Setting default values of parameters and initial conditions.
+- Default reaction rate laws and `ModelingtToolkit.ODESystem`
+- Alternative rate laws via the `combinatoric_ratelaws=false` option.
+- Other ModelingToolkit system types.
 "
 
 # ╔═╡ 25f947a8-0352-4588-b7e6-ff715c367d1e
@@ -226,7 +226,7 @@ Let's check this by solving and plotting them:"
 let
 	sol = solve(oprob, Tsit5())
 	sol2 = solve(oprob2, Tsit5())
-	plot(plot(sol, title="oprob"), plot(sol2, title="oprob2"))
+	plot(plot(sol, title="oprob", legend=:right), plot(sol2, title="oprob2", legend=:right))
 end
 
 # ╔═╡ 96047157-4d4c-429d-82a1-679e0d9872e6
@@ -266,7 +266,7 @@ oprob2_nocr = ODEProblem(osys_nocr, u₀MT, tspan, pMT);
 let
 	sol = solve(oprob_nocr, Tsit5())
 	sol2 = solve(oprob2_nocr, Tsit5())
-	plot(plot(sol, title="oprob_nocr"), plot(sol2, title="oprob2_nocr"))
+	plot(plot(sol, title="oprob_nocr", legend=:right), plot(sol2, title="oprob2_nocr", legend=:right))
 end
 
 # ╔═╡ 57588fcd-a0c5-4be9-9687-56bdd15a6d35
@@ -304,11 +304,44 @@ where ``Y(t)`` denotes a unit Poission counting process, and the jump process tr
 a(S_1(t),\dots,S_L(t)) = k \prod_{i=1}^L \frac{S_i (S_i-1) \dots (S_i - m_i + 1)}{m_i!}
 ```
 
-**Setting `combinatoric_ratelaws=false` in `SDEProblem(rn,...)`, `JumpProblem(rn,...)`, `convert(SDESystem, rn...)`, or `convert(JumpSystem, rn...)` will again drop the denominators in the rate laws!**
+So in general
 "
 
-# ╔═╡ 48678636-1c58-46b3-a91c-8ce0aa1443db
+# ╔═╡ c8ce323a-86b4-43ec-ba7f-3433c4f6ffc2
+combinatoric_ratelaws = true;  # or false!
 
+# ╔═╡ dbfe7922-f4a9-4030-bf44-01d23a7991e6
+sprob = SDEProblem(rn, u₀, tspan, p; combinatoric_ratelaws);
+
+# ╔═╡ 6e3d1343-c37c-4f2b-9faf-9f4f988c52e9
+md"is equivalent to"
+
+# ╔═╡ 0c7b2e3a-98b7-49e2-8c76-7825c2faaedc
+sdesys = convert(SDESystem, rn; combinatoric_ratelaws);
+
+# ╔═╡ 9373bc36-f8b1-4cf2-99e7-0a51988db24d
+sprob2 = SDEProblem(sdesys, u₀MT, tspan, pMT);
+
+# ╔═╡ 91acc7bb-6606-4f16-8511-a70e754e8b47
+md"and"
+
+# ╔═╡ 65d8c886-2cc6-481c-b033-9a9a890164ff
+dprob = DiscreteProblem(rn, u₀, tspan, p);
+
+# ╔═╡ 19ccc574-0f36-496f-abc4-c35821c4e662
+jprob = JumpProblem(rn, dprob, Direct(); combinatoric_ratelaws);
+
+# ╔═╡ 4fceb9bf-51fa-423a-992e-1966abbbad8e
+md"is equivalent to "
+
+# ╔═╡ 82bb6f0c-2a9a-4942-9ebc-d971eea13fb4
+jsys = convert(JumpSystem, rn; combinatoric_ratelaws);
+
+# ╔═╡ 5285aead-f558-4eee-a1f2-6a521ec4716d
+jprob2 = JumpProblem(jsys, dprob, Direct());
+
+# ╔═╡ 48678636-1c58-46b3-a91c-8ce0aa1443db
+md"#### See the [first Catalyst tutorial](https://catalyst.sciml.ai/dev/tutorials/using_catalyst/#Reaction-rate-laws-used-in-simulations) for more information!"
 
 # ╔═╡ Cell order:
 # ╟─47323c44-09fe-11ed-0e8c-1b3df7e3b610
@@ -348,7 +381,18 @@ a(S_1(t),\dots,S_L(t)) = k \prod_{i=1}^L \frac{S_i (S_i-1) \dots (S_i - m_i + 1)
 # ╠═1787ba78-fd36-4dd0-85ca-b29c64adf858
 # ╟─2f898587-ea3f-40c2-bb8c-e03fc4f8f83e
 # ╠═1f2332be-7bec-4ae9-a99f-d0e6b5206bc1
-# ╟─0506a612-0cff-429e-9a80-5ff7b770637f
+# ╠═0506a612-0cff-429e-9a80-5ff7b770637f
 # ╟─57588fcd-a0c5-4be9-9687-56bdd15a6d35
 # ╟─3596e588-9421-46f0-91ea-84e74b624172
-# ╠═48678636-1c58-46b3-a91c-8ce0aa1443db
+# ╠═c8ce323a-86b4-43ec-ba7f-3433c4f6ffc2
+# ╠═dbfe7922-f4a9-4030-bf44-01d23a7991e6
+# ╟─6e3d1343-c37c-4f2b-9faf-9f4f988c52e9
+# ╠═0c7b2e3a-98b7-49e2-8c76-7825c2faaedc
+# ╠═9373bc36-f8b1-4cf2-99e7-0a51988db24d
+# ╟─91acc7bb-6606-4f16-8511-a70e754e8b47
+# ╠═65d8c886-2cc6-481c-b033-9a9a890164ff
+# ╠═19ccc574-0f36-496f-abc4-c35821c4e662
+# ╟─4fceb9bf-51fa-423a-992e-1966abbbad8e
+# ╠═82bb6f0c-2a9a-4942-9ebc-d971eea13fb4
+# ╠═5285aead-f558-4eee-a1f2-6a521ec4716d
+# ╟─48678636-1c58-46b3-a91c-8ce0aa1443db
