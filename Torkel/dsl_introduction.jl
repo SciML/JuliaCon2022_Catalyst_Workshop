@@ -170,12 +170,12 @@ Another (artificial) example:
 "
 
 # ╔═╡ b838469c-7658-41a5-af1c-272fe1ceff68
-begin
-	stoich_example_model = @reaction_network begin
-		r, 2X + 3Y --> Z
-	end r
-	show_odes(stoich_example_model)
-end
+stoich_example_model = @reaction_network begin
+	r, 2X + 3Y --> Z
+end r;
+
+# ╔═╡ fbdcc69a-6849-48c4-8e8c-de3c31bb77c2
+show_odes(stoich_example_model)
 
 # ╔═╡ 3f1c0b3c-f988-4180-b637-ba6e11f8ada8
 md"
@@ -195,7 +195,7 @@ The birth-death model essentially consists of a single, reversible, reaction.
 "
 
 # ╔═╡ a4b6ad01-2713-4927-89c2-d3dd1de4de6a
-bd_model_1 = @reaction_network begin
+bd_model_1 = @reaction_network bdmodel begin
 	b, 0 --> X
 	d, X --> 0
 end b d
@@ -206,14 +206,17 @@ It can be declared using a more concise notation:
 "
 
 # ╔═╡ eea4866b-4362-4dd7-8388-99c1bcf31b91
-bd_model_2 = @reaction_network begin
+bd_model_2 = @reaction_network bdmodel begin
 	(b,d), 0 <--> X
 end b d;
 
 # ╔═╡ f833c3a7-7528-48fb-8690-9f2c33acdaeb
 md"
-The two reaction networks are identical (although == identity does not hold). In the second declaration, the reaction rate is a tuple. The tuple's first element denotes the forward rate, and the second element the backward rate.
+In the second declaration, the reaction rate is a tuple. The tuple's first element denotes the forward rate, and the second element the backward rate. The  resulting two reaction networks are identical:
 "
+
+# ╔═╡ 86785f28-8e19-4003-9a0e-f8598a187610
+bd_model_1 == bd_model_2
 
 # ╔═╡ af9591d6-5084-4fc8-97a5-1cd3eb0cfdc6
 md"
@@ -357,18 +360,21 @@ catalystic_conversion_model_2 = @reaction_network begin
 	k, S + C --> P + C
 end k;
 
+# ╔═╡ cdc08054-8843-44e4-8f2b-2b2b2e553d7f
+show_odes(catalystic_conversion_model_2)   
+
 # ╔═╡ 99f750e6-955f-4153-aa72-a697b0115e2a
 md"
 This model can also be declared with *C* as a parameter:
 "
 
 # ╔═╡ 2d8ca198-cdec-41d7-97da-391af3585d8a
-begin
-	catalystic_conversion_model_Cpar = @reaction_network begin
-		k*C, S --> P
-	end k C;
-	show_odes(catalystic_conversion_model_Cpar)   
-end
+catalystic_conversion_model_Cpar = @reaction_network begin
+	k*C, S --> P
+end k C;
+
+# ╔═╡ 25fc399b-c082-4b89-b254-98a016406e55
+show_odes(catalystic_conversion_model_Cpar)
 
 # ╔═╡ 168d71b9-a68a-493a-8297-58cb3f1d1c78
 md"
@@ -394,13 +400,13 @@ A common, non-constant, reaction rate is the Michaelis-Menten function, where th
 "
 
 # ╔═╡ 48ab4be5-aaa6-4029-a547-b613d628274e
-begin
-	self_activation_model = @reaction_network begin
-		v*X/(X+K), 0 --> X
-		d, X --> 0
-	end v K d
-	show_odes(self_activation_model)   
-end
+self_activation_model = @reaction_network begin
+	v*X/(X+K), 0 --> X
+	d, X --> 0
+end v K d
+
+# ╔═╡ 196f3459-f497-4f02-b082-b664b2c6d755
+show_odes(self_activation_model)  
 
 # ╔═╡ 4505007d-d979-4e6c-a1f3-2bf0895b09b5
 md"
@@ -435,6 +441,15 @@ md"
 The symbol t, when used within the Catalyst DSL, is reserved for the time variable. It can be used to make reaction rates time-dependent.
 "
 
+# ╔═╡ 8f67a2fa-6e8c-467f-8055-fcb6cde0b358
+time_birth_death_model = @reaction_network begin
+	b/t, 0 --> X
+	d, X --> 0
+end b d;
+
+# ╔═╡ 6b6477dd-7fa2-4332-91f5-08a8d0dc8055
+show_odes(time_birth_death_model)
+
 # ╔═╡ e5231880-99ed-4d2e-939e-f78da6f1f2a2
 md"
 This can be used to make reactions that only occur after a certain timepoint:
@@ -445,15 +460,6 @@ timed_birth_death_model = @reaction_network begin
 	b*(sign(t-t0)+1)/2, 0 --> X
 	d, X --> 0
 end t0 b d;
-
-# ╔═╡ 8f67a2fa-6e8c-467f-8055-fcb6cde0b358
-begin
-	time_birth_death_model = @reaction_network begin
-		b/t, 0 --> X
-		d, X --> 0
-	end b d
-	show_odes(timed_birth_death_model)
-end
 
 # ╔═╡ 66cfc5a9-ed0c-433d-9cde-74f031b5857f
 md"
@@ -501,21 +507,105 @@ By using \"unfilled\" arrows (⇒, ⇐, ⇔), the law of mass action in an indiv
 "
 
 # ╔═╡ 6a624b9b-4718-48d5-a2eb-20c0ac54f080
-begin
-	non_lma_model = @reaction_network begin
-		p1, 0 ⇒ Y1
-		p2, X ⇒ Y2
-		p3, 2X ⇒ Y3
-		p4, 3X ⇒ Y4
-		p5, 4X + 2Z ⇒ Y5
-	end p1 p2 p3 p4 p5
-	show_odes(non_lma_model)
-end
+non_lma_model = @reaction_network begin
+	p1, 0 ⇒ Y1
+	p2, X ⇒ Y2
+	p3, 2X ⇒ Y3
+	p4, 3X ⇒ Y4
+	p5, 4X + 2Z ⇒ Y5
+end p1 p2 p3 p4 p5;
+
+# ╔═╡ efa506b7-44c6-4405-92fa-140c426990cd
+show_odes(non_lma_model)
 
 # ╔═╡ dc9bbd45-b2ed-4d6a-a664-fdf0f5476517
 md"
 If you are using this feature extensively, it is likely that there is a better way of implementing your models.
 "
+
+# ╔═╡ 3f86541e-0307-4c3b-8bf2-65160b7a901a
+md"
+## Acessing the reaction system object
+The \"@reaction_network\" macro creaets a *ReactionSystem* structure, which we can investigate.
+"
+
+# ╔═╡ 68797a0a-59c3-4417-9758-19ea26e97a56
+binding_model = @reaction_network begin
+	(p,d), 0 <--> (X,Y)
+	(kB,kD), X + Y <--> XY
+end p d kB kD
+
+# ╔═╡ 83b55620-366d-45db-9d9a-e81f45cd0525
+md"
+Species can be fetched using the \"species\" function:
+"
+
+# ╔═╡ 65ee418e-be95-4f82-a245-e5479fa1375f
+species(binding_model)
+
+# ╔═╡ 89c3132a-c4a1-45e9-8dbe-3122258a6f43
+md"
+Parameters can be fetched using the \"parameters\" function:
+"
+
+# ╔═╡ e2e04178-f99e-4093-a0e0-4d3d602547d7
+parameters(binding_model)
+
+# ╔═╡ a9861c1a-6e82-4033-8d9d-31aa68290c1b
+md"
+Reactions can be fetched using the \"reactions\" function:
+"
+
+# ╔═╡ 7ba65dc5-1500-494e-b893-2a3ae75a642a
+reactions(binding_model)
+
+# ╔═╡ 612fe079-5d2b-4244-95f8-6e67f93a542b
+md"
+# Excersise: Implement networks using the Catalyst DSL
+Implement the following reaction networks using the Catalyst DSL. You can reveal the network box to see the network. If you use the same name for your model (optional input between \"@reaction_network\" and \"begin\"), you can check equality using \"==\". Try writing the network by combining similar reactions.
+"
+
+# ╔═╡ 66728203-e607-4b03-8520-85c2864b89ec
+excersise_rn_1 = @reaction_network ern1 begin
+	p, 0 --> (X,Y)
+	d, (X,Y) --> 0
+	(kB,kD), X + Y <--> XY
+end p d kB kD
+
+# ╔═╡ e75d0780-28f9-4578-8cad-f52736cd2160
+# answer_rn_1 = @reaction_network ern1 begin
+# 	 # Write network here.
+# end 
+# answer_rn_1 == excersise_rn_1
+
+# ╔═╡ 65f61e36-7794-41c2-b04f-1422ffd45870
+excersise_rn_2 = @reaction_network ern2 begin
+	b, S + I --> 2I
+	k, I --> R
+end b k
+
+# ╔═╡ 0a0144cb-25bd-413b-adbd-31436b3c7cd4
+
+
+# ╔═╡ 8899e7dd-8635-45d6-9e96-c86d6a0c91b0
+excersise_rn_3 = @reaction_network ern3 begin
+	(p,d), 0 <--> C
+	mm(C,v,K), S --> P
+end p d v K
+
+# ╔═╡ bdb26875-46c2-4398-a3dc-1a462d7dd889
+
+
+# ╔═╡ 6c4881a5-f6ba-45cb-aaa4-376bb78e8050
+excersise_rn_4 = @reaction_network ern4 begin
+	hill(K,v,Z,n), 0 --> X
+	hill(K,v,X,n), 0 --> Y
+	hill(K,v,Y,n), 0 --> Z
+	d, 0 --> (X,Y,Z)
+end v K n d
+
+# ╔═╡ bf7922f9-a721-4dc0-a766-3bc005927936
+
 
 # ╔═╡ Cell order:
 # ╟─37a68fe9-328d-4e10-84da-113dae3b1a9e
@@ -535,9 +625,10 @@ If you are using this feature extensively, it is likely that there is a better w
 # ╟─620f072c-1d4b-4ae3-895e-c792471502fe
 # ╠═c0ab7ba6-0437-44cc-85d9-af6d2753339a
 # ╟─83b8f3fd-bff1-4588-b951-87863ff885b5
-# ╠═024163ae-0ad4-41fd-a48b-0ed85876d960
+# ╟─024163ae-0ad4-41fd-a48b-0ed85876d960
 # ╟─2feb2fe7-2c07-4d7e-9b19-e8e7d68f1e24
 # ╠═b838469c-7658-41a5-af1c-272fe1ceff68
+# ╟─fbdcc69a-6849-48c4-8e8c-de3c31bb77c2
 # ╟─3f1c0b3c-f988-4180-b637-ba6e11f8ada8
 # ╟─7cfadb90-4283-4471-b707-373b01aa4fd8
 # ╟─ad17c467-0852-4414-a2c4-df8b36329846
@@ -545,6 +636,7 @@ If you are using this feature extensively, it is likely that there is a better w
 # ╟─ba96bd32-dc39-4a95-86c7-aeb00abf00e3
 # ╠═eea4866b-4362-4dd7-8388-99c1bcf31b91
 # ╟─f833c3a7-7528-48fb-8690-9f2c33acdaeb
+# ╠═86785f28-8e19-4003-9a0e-f8598a187610
 # ╟─af9591d6-5084-4fc8-97a5-1cd3eb0cfdc6
 # ╟─d20a7c6f-a4c2-444f-9f96-2e89e567f7bb
 # ╠═b4a04318-7e91-4b73-841b-dad3ba371cd8
@@ -559,29 +651,33 @@ If you are using this feature extensively, it is likely that there is a better w
 # ╠═b393d7ac-92d7-4b9f-9ad3-612af0357d55
 # ╟─0b3ebdbe-acdf-47a4-a3bd-a079a8d5f39e
 # ╠═27607ab3-0a4a-4163-8e0c-0b1df2ff9503
-# ╠═a6b0736c-5adf-4c80-97d5-4bfae766c7c0
+# ╟─a6b0736c-5adf-4c80-97d5-4bfae766c7c0
 # ╟─b5153ab7-1e71-4ce2-8598-831c971df361
 # ╟─e7f19045-d570-4f0d-aa87-6c663aeed353
 # ╠═89d98e58-4e37-4e35-aadc-c75588213f20
 # ╟─f7cb85e6-e336-487b-bbbd-799169102b9f
 # ╠═46239ac5-9981-4e71-9723-73e44d203dca
 # ╟─40dca2fe-500a-4b8a-8ba1-524fafadc5cc
-# ╠═b4f94075-900c-478c-98f2-5dcbe366c5da
+# ╟─b4f94075-900c-478c-98f2-5dcbe366c5da
 # ╟─561aca56-33ac-4626-b71d-7b1790206e82
 # ╠═2f74f398-520b-4b6e-ae35-189e7c973a52
+# ╟─cdc08054-8843-44e4-8f2b-2b2b2e553d7f
 # ╟─99f750e6-955f-4153-aa72-a697b0115e2a
 # ╠═2d8ca198-cdec-41d7-97da-391af3585d8a
+# ╟─25fc399b-c082-4b89-b254-98a016406e55
 # ╟─168d71b9-a68a-493a-8297-58cb3f1d1c78
 # ╠═ce70f930-7e16-46ee-8e7c-628296387010
 # ╟─29da9119-2afa-40df-8e08-0c2e9fbbc8fc
 # ╟─bc967d1a-3250-4e26-925c-48a8fb31325b
 # ╠═48ab4be5-aaa6-4029-a547-b613d628274e
+# ╟─196f3459-f497-4f02-b082-b664b2c6d755
 # ╟─4505007d-d979-4e6c-a1f3-2bf0895b09b5
 # ╠═0bc1b485-6a14-47a7-8e27-92553f6373f8
 # ╟─90fd40b5-2126-4933-8d2f-7d9f0d1a4b97
 # ╠═0dce9985-7a36-45b5-a7b1-3b1a29205974
 # ╟─16df399c-3c35-4a62-92d3-ac7f873e7d34
 # ╠═8f67a2fa-6e8c-467f-8055-fcb6cde0b358
+# ╟─6b6477dd-7fa2-4332-91f5-08a8d0dc8055
 # ╟─e5231880-99ed-4d2e-939e-f78da6f1f2a2
 # ╠═971da382-3cfb-4e03-8891-e8ffe821c536
 # ╟─66cfc5a9-ed0c-433d-9cde-74f031b5857f
@@ -593,4 +689,22 @@ If you are using this feature extensively, it is likely that there is a better w
 # ╟─44ed2602-67d8-483a-92e4-541a3577d332
 # ╟─232099b8-08f9-4afe-8d9f-2e6c8cc585f0
 # ╠═6a624b9b-4718-48d5-a2eb-20c0ac54f080
+# ╠═efa506b7-44c6-4405-92fa-140c426990cd
 # ╟─dc9bbd45-b2ed-4d6a-a664-fdf0f5476517
+# ╟─3f86541e-0307-4c3b-8bf2-65160b7a901a
+# ╠═68797a0a-59c3-4417-9758-19ea26e97a56
+# ╠═83b55620-366d-45db-9d9a-e81f45cd0525
+# ╠═65ee418e-be95-4f82-a245-e5479fa1375f
+# ╟─89c3132a-c4a1-45e9-8dbe-3122258a6f43
+# ╠═e2e04178-f99e-4093-a0e0-4d3d602547d7
+# ╟─a9861c1a-6e82-4033-8d9d-31aa68290c1b
+# ╠═7ba65dc5-1500-494e-b893-2a3ae75a642a
+# ╟─612fe079-5d2b-4244-95f8-6e67f93a542b
+# ╟─66728203-e607-4b03-8520-85c2864b89ec
+# ╠═e75d0780-28f9-4578-8cad-f52736cd2160
+# ╟─65f61e36-7794-41c2-b04f-1422ffd45870
+# ╠═0a0144cb-25bd-413b-adbd-31436b3c7cd4
+# ╟─8899e7dd-8635-45d6-9e96-c86d6a0c91b0
+# ╠═bdb26875-46c2-4398-a3dc-1a462d7dd889
+# ╟─6c4881a5-f6ba-45cb-aaa4-376bb78e8050
+# ╠═bf7922f9-a721-4dc0-a766-3bc005927936

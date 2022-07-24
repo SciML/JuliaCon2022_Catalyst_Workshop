@@ -258,6 +258,26 @@ md"
 While it is not the case for this CRN, we note that some solutions with negative species concentrations may still appear, in which case these needs also be filtered out.
 "
 
+# ╔═╡ c195dc55-4db9-44ed-ac8d-1fef9810811c
+md"
+# Excersise: Bifurcation Diagram for Wilhelm 2009 Model
+Consider the following, slightly modified model from the previous section. Try computing the bifurcation diagram for the parameter k2, over the interval (1.0,15.0). Attempt to use homotopy Continuation to confirm it finds the same fixed points for various selections of k2. Hint: You might need to modify the \"maxSteps\" argument.
+"
+
+# ╔═╡ 580f6825-2f27-4187-a5c3-087479941bc4
+begin
+	wilhelm_2009_moddified_model = @reaction_network begin
+		0.1, 0 --> X
+	    k1, Y --> 2X
+	    k2, 2X --> X + Y
+	    k3, X + Y --> Y
+	    k4, X --> 0
+	end k1 k2 k3 k4
+end;
+
+# ╔═╡ 92789d15-12a1-4045-8ca0-c77d1e7f457b
+
+
 # ╔═╡ Cell order:
 # ╟─0dd82ade-f03f-4fa6-be3a-93be2aa84fef
 # ╟─7db3edc6-0a8a-11ed-2367-a7af8e31d073
@@ -293,3 +313,6 @@ While it is not the case for this CRN, we note that some solutions with negative
 # ╟─40058a11-195e-4443-a946-6be9dbabd7e6
 # ╠═939c4ca8-db48-4a08-bfc7-0632a0315a58
 # ╟─11ed4d07-0104-4994-9fea-14eef6393aac
+# ╟─c195dc55-4db9-44ed-ac8d-1fef9810811c
+# ╠═580f6825-2f27-4187-a5c3-087479941bc4
+# ╟─92789d15-12a1-4045-8ca0-c77d1e7f457b
