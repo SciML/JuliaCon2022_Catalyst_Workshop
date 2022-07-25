@@ -122,7 +122,7 @@ To ensure the diagram is plotted across the whole parameter range, we need to mo
 "
 
 # ╔═╡ 6a43f65e-5817-436a-8381-1dde21e606ae
-begin
+begin\
 	bif_params = copy(params)
 	bif_params[bif_par_idx] = p_span[1]
 end;
@@ -169,6 +169,26 @@ plot(bif_dia)
 md"
 BifurcationKit is a powerful package, that is capable of a lot more. In addition, for some systems, additional considerations are required. Please consult https://bifurcationkit.github.io/BifurcationKitDocs.jl/dev/ for more details
 "
+
+# ╔═╡ bfaa59d1-95db-427f-aa2c-7fb0af0a0449
+md"
+!!! note 
+This approach only works if the bifurcation diagram can be tracked as one continious line. If we reduce the parameter range (so that the first bifurcation point is not reached), the bistable region is not properly found. There are alternative methods for handling these cases.
+"
+
+# ╔═╡ 586f9f1e-1e53-4091-839f-b301e0683437
+let
+	p_span = (0.0,0.2)
+	opts_br = ContinuationPar(
+			pMin=p_span[1], pMax=p_span[2],
+			dsmax = 1e-2, dsmin = 1e-5, ds=1e-3, maxSteps=1000,
+			detectBifurcation=3);
+	bif_dia = bifurcationdiagram(jet..., u0, bif_params, (@lens _[bif_par_idx]), 2,
+	                (x,p,level)->setproperties(opts_br);
+	                tangentAlgo = BorderedPred(),
+	                recordFromSolution=(x, p) -> x[plot_var_idx], verbosity = 0, plot=false);
+	plot(bif_dia)
+end
 
 # ╔═╡ 8b1b0583-85ea-404f-8703-4c0cc1e77662
 md"
@@ -241,8 +261,8 @@ end;
 # ╟─0dd82ade-f03f-4fa6-be3a-93be2aa84fef
 # ╟─4eb379f0-1492-4c5f-8e9d-2704eedf9602
 # ╟─0649a89d-77f1-42f9-96e7-7f61cca954ea
-# ╠═e3b90e09-1613-4e48-8860-b50ac1c47fca
-# ╠═d214fb01-ce3a-44d5-a036-1d88c13a4e58
+# ╟─e3b90e09-1613-4e48-8860-b50ac1c47fca
+# ╟─d214fb01-ce3a-44d5-a036-1d88c13a4e58
 # ╟─ab7d1177-f46d-4cc1-be60-9fa78631189d
 # ╟─8777ec41-71c3-43e9-993f-4e4069890dcf
 # ╠═b064289b-14ae-4441-b871-369e1e41df8a
@@ -263,6 +283,8 @@ end;
 # ╟─b394fa10-9cd5-4bcf-9791-0ee431fc70ec
 # ╠═b532a718-df9c-4935-b23c-a21b7e9dfead
 # ╟─105e49ae-dd43-4431-8006-226b9a1ab12a
+# ╟─bfaa59d1-95db-427f-aa2c-7fb0af0a0449
+# ╠═586f9f1e-1e53-4091-839f-b301e0683437
 # ╟─8b1b0583-85ea-404f-8703-4c0cc1e77662
 # ╟─968f458f-5022-47cc-a667-038cd80bcdc8
 # ╠═ff2eaf0a-074a-4401-8a55-9d1756c29474

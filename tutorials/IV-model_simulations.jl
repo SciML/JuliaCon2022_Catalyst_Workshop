@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, DifferentialEquations, Plots
+	using Catalyst, DifferentialEquations, PlutoUI, Plots
 end
 
 # ╔═╡ b67e5b7f-3664-4ae2-bf0c-aaadb0165dca
@@ -177,6 +177,12 @@ let
 	plot(ssol_ns)
 end
 
+# ╔═╡ 1f9dc9de-d069-4255-93ab-06f27455ddd3
+md"
+!!! note 
+Here, noise pushes the solution into the negative domain. This can be handled e.g. through a \"PositiveDomain\" callback. However, this is a sign that using Gillespie's approach is more appropriate for this system.
+"
+
 # ╔═╡ 83ec221d-5ed0-4616-bf26-4e17af26cfe4
 md"
 ## Callbacks permit mid-simulation events
@@ -322,7 +328,7 @@ begin
 	u0_b = [:X => 5.0, :Y => 0.5]
 	tspan_b = (0.,200000.0)
 	p_b = [:A => 1.0, :B =>3.0]
-end
+end;
 
 # ╔═╡ 346a8fe9-75e0-448f-809d-ab54e63f681e
 md"
@@ -361,6 +367,9 @@ end;
 md"
 For a large model (BCR), using the Jacobian makes simulations twice as fast. Setting it to sparse provides a speed up of almost 2 orders of magnitude!
 "
+
+# ╔═╡ d497f6f2-6254-4425-9d5e-2f621685405f
+LocalResource("bcr_jacobian_simtime.png")
 
 # ╔═╡ f146c1ba-7132-4c80-bc00-1b62f416ecad
 md"
@@ -406,6 +415,7 @@ end
 # ╠═9f536f9d-15b1-4499-be35-debf0048ed5c
 # ╟─2a5584f3-4a33-439f-a0de-6ddb767937cf
 # ╠═1e37edbb-58e9-4f79-95ab-3dab20b9a586
+# ╟─1f9dc9de-d069-4255-93ab-06f27455ddd3
 # ╟─83ec221d-5ed0-4616-bf26-4e17af26cfe4
 # ╠═c4757730-4cff-415c-991d-b6e917ac6288
 # ╠═2235f660-7601-4e04-ab4d-77e33c09ff22
@@ -439,5 +449,6 @@ end
 # ╟─29e081a9-0df3-4522-aff0-bf062486ba9a
 # ╠═48d084d5-09a6-4c67-b95f-3840889a3db6
 # ╟─6ff919f2-39f7-4cbd-a6d2-6e57ca3fc3bc
+# ╟─d497f6f2-6254-4425-9d5e-2f621685405f
 # ╟─f146c1ba-7132-4c80-bc00-1b62f416ecad
 # ╠═37ced29b-b58b-4e90-bf57-4ed9b39621a5
