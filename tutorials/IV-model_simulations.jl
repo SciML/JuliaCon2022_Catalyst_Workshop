@@ -298,6 +298,11 @@ And the time object through the \"t\" field.
 # ╔═╡ f773f53e-6407-4775-b2aa-fca261d2bed6
 sol.t
 
+# ╔═╡ 6713871b-027c-40ad-876e-c54491c60fbf
+md"
+!!! note 
+*Later we will show how one can easily use symbolic variables to access the solution and make plots, avoiding the need to know the integer index of a variable.*"
+
 # ╔═╡ ece97e85-012d-4bc0-8933-3a27a05ede28
 md"
 ## Jacobian for simulations
@@ -359,7 +364,7 @@ For a large model (BCR), using the Jacobian makes simulations twice as fast. Set
 
 # ╔═╡ f146c1ba-7132-4c80-bc00-1b62f416ecad
 md"
-# Excersise: Simulate birth-death model.
+# Exercise: Simulate birth-death model.
 Simulate the following birth-death model for the following parameter sets. What happens when fluctuations become large? What happens when concentrations are low (Hint: for low copy number simulations, a Gillespie approach is better than a CLE approach).
 
 Next, for p1, p2, p3. Compare the effect of selecting these parameter sets to that of scaling the noise in the SDE problem.
@@ -424,6 +429,7 @@ end
 # ╟─e9570862-4021-44f4-b8e4-a374489f1301
 # ╟─97ea0edd-ff92-4a83-bcbc-5ce5a3e90bb3
 # ╠═f773f53e-6407-4775-b2aa-fca261d2bed6
+# ╟─6713871b-027c-40ad-876e-c54491c60fbf
 # ╟─ece97e85-012d-4bc0-8933-3a27a05ede28
 # ╠═9a531c2e-474c-425c-9757-ed3b77c2388a
 # ╟─346a8fe9-75e0-448f-809d-ab54e63f681e
