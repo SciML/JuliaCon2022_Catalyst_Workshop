@@ -179,7 +179,7 @@ The current SSAs available for mixed `ConstantRateJump` and `MassActionJump` pro
 - Gillespie's first reaction method (`FRM`)
 - Gibson and Bruck's next reaction method (`NRM`)
 - *Sorting direct method (`SortingDirect`)*
-- Reject direct method (`RDirect`)
+- Rejection direct method (`RDirect`)
 - *Composition-rejection direct method (`DirectCR`)*
 - *Rejection-SSA (RSSA)*
 - *Rejection-SSA with composition-rejection (RSSACR)*
@@ -223,7 +223,7 @@ md"Finally, we consider a much larger model of a B cell receptor (BCR) signaling
 
 This model can be loaded into Catalyst via [ReactionNetworkImporters.jl](https://github.com/SciML/ReactionNetworkImporters.jl) package, see the examples folder there.
 
-We find
+We find (times in ms)
 "
 
 # ╔═╡ f34a0386-9824-41ce-9a86-87f2620df72d
@@ -259,7 +259,7 @@ firsttimeprob, firsttimecb = let
 	@unpack DNA, DNAR = jsys
 
 	# get its integer index within the solution vector, u
-	DNARidx = findfirst(isequal(DNAR), species(jsys))
+	DNARidx = findfirst(isequal(DNAR), states(jsys))
 
 	# the condition function to stop a simulation
 	function first_DNAR_cond(u, t, integrator; DNARidx=DNARidx)
@@ -386,7 +386,7 @@ end
 # ╠═39943d98-4711-4a37-aa7b-2823dbcc5595
 # ╠═fb48eabe-ea6f-4746-8ec5-ab55111a8ead
 # ╠═f23a97db-4000-4e5f-b2d4-3182c399cb2d
-# ╠═bdca5464-9bac-475f-8b9e-8e9c17e6d5bf
+# ╟─bdca5464-9bac-475f-8b9e-8e9c17e6d5bf
 # ╠═44db3690-450f-4fee-a99f-54ad8a352a1f
 # ╠═a6cd74e7-f1a6-4f8e-9514-bdeb7e0fc7b0
 # ╠═6f4eb0ad-7253-4ed4-8781-004f77c31ed4

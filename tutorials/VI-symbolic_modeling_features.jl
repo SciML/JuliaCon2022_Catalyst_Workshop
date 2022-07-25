@@ -178,7 +178,7 @@ rxs == rxs2
 md"Now we are ready to construct our `ReactionSystem`, which stores the chemical reaction network and is the output of the `@reaction_network` macro:"
 
 # ╔═╡ 68be114a-471e-44a8-a0b0-7ebc8b2c96c8
-@named oregonator = ReactionSystem(rxs, t)
+@named oregonator = ReactionSystem(rxs, t)  # alt: rn2 = ReactionSystem(rxs, t; name=:oregonator)
 
 # ╔═╡ f21d53e9-1674-47db-9b63-d78c9dfedf2e
 oregonator == rn
@@ -253,7 +253,7 @@ burstysol = let
 	dprob = DiscreteProblem(burstygene, u₀, tspan, p)
 	jprob = JumpProblem(burstygene, dprob, Direct())
 	sol = solve(jprob, SSAStepper())
-end
+end;
 
 # ╔═╡ cbb87922-da86-494e-8e46-7ecbad29f432
 md"Suppose we just want to plot `P`, we can use symbolic indexing with `sol` to get at it. There are several ways we can do this. 
@@ -270,7 +270,7 @@ md"
 # ╔═╡ edd33cf5-b00e-4b13-bdfe-175cb01f6822
 let
 	@unpack P = burstygene
-	plot(burstysol, vars=P)
+	plot(burstysol, vars=P, legend=:bottomright)
 end
 
 # ╔═╡ 92c7f19d-9299-488e-87e9-76c68fe26405
@@ -279,7 +279,7 @@ md"3. We just create a symbolic variable named `P(t)` from scratch and use it"
 # ╔═╡ e7a89226-4757-42c1-825a-b117ae439c1e
 let
 	@variables P(t)
-	plot(burstysol, vars=P)
+	plot(burstysol, vars=P, legend=:bottomright)
 end
 
 # ╔═╡ 9252661d-6fb8-47fb-805d-895f228df4e2
@@ -287,6 +287,7 @@ md"We can use each of these to access the solution at specific times too, for ex
 
 # ╔═╡ 03ce0b66-6860-4f8b-9f22-ec9ffaec60d1
 u = let
+	@unpack P = burstygene
 	tv = collect(range(0, 1, length=10))
 	burstysol(tv, idxs=P)
 end
@@ -341,22 +342,22 @@ end
 # ╔═╡ 82ac4773-4320-4683-85d1-8bdc0f5a77a3
 md"works, but"
 
+# ╔═╡ 5535c9cc-bb87-4046-8621-93214829a012
+let
+	@parameters b
+	round(b)
+end
+
 # ╔═╡ ed06ac37-98bb-4a28-81c7-29885405fa3b
 md"fails. If we register it though it will be usable:"
 
 # ╔═╡ 771e0080-a6d4-4de8-a7ec-3bb3949fc57f
 let 
 	# this is needed to define a version of it for symbolic variables
-	import Base: round   
-	@parameters b
-	@register_symbolic round(x)
-	round(b)
-end
-
-# ╔═╡ 5535c9cc-bb87-4046-8621-93214829a012
-let
-	@parameters b
-	round(b)
+	# import Base: round   
+	# @parameters b
+	# @register_symbolic round(x)
+	# round(b)
 end
 
 # ╔═╡ 09d51be7-0972-4701-bfd7-471b207f518d
@@ -571,7 +572,7 @@ md"Next we create a `ModelingToolkit.ODESystem` to store the equation for `dV/dt
 voltageode = let
 	@parameters C=1.0 ḡNa=120.0 ḡK=36.0 ḡL=.3 ENa=45.0 EK=-82.0 EL=-59.0 I₀=0.0
 	@variables m(t) n(t) h(t)
-	I = I₀* sin(2*pi*t/30)^2 
+	I = I₀ * sin(2*pi*t/30)^2 
 
 	Dₜ = Differential(t)
 	eqs = [Dₜ(V) ~ -1/C * (ḡK*n^4*(V-EK) + ḡNa*m^3*h*(V-ENa) + ḡL*(V-EL)) + I/C]
@@ -644,7 +645,7 @@ md"Let's set some default initial values for the voltage and gating variables."
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
 # ╠═3177b2e3-eefd-4faf-b292-2c7c6f0bbe22
 # ╠═d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
-# ╠═dbfd836f-d475-48e7-9afd-8f02d9785f42
+# ╟─dbfd836f-d475-48e7-9afd-8f02d9785f42
 # ╟─e63ce294-4e50-4fec-8092-8f34facfd7f5
 # ╠═6c8e9c23-eca9-4b91-8391-8eefeb3b3745
 # ╟─0c4f8cd6-b05e-4386-956f-9eaa404ab656

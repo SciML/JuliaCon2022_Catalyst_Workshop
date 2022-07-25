@@ -266,6 +266,10 @@ a(S_1(t),\dots,S_L(t)) = k \prod_{i=1}^L \frac{S_i (S_i-1) \dots (S_i - m_i + 1)
 So in general
 "
 
+# ╔═╡ 93c68122-9121-4436-967c-a6babf53075a
+#2A --> 0 
+# k * A * (A-1) / 2
+
 # ╔═╡ c8ce323a-86b4-43ec-ba7f-3433c4f6ffc2
 combinatoric_ratelaws = true;  # or false!
 
@@ -345,6 +349,7 @@ md"#### See the [first Catalyst tutorial](https://catalyst.sciml.ai/dev/tutorial
 # ╠═0506a612-0cff-429e-9a80-5ff7b770637f
 # ╟─57588fcd-a0c5-4be9-9687-56bdd15a6d35
 # ╟─3596e588-9421-46f0-91ea-84e74b624172
+# ╠═93c68122-9121-4436-967c-a6babf53075a
 # ╠═c8ce323a-86b4-43ec-ba7f-3433c4f6ffc2
 # ╠═dbfe7922-f4a9-4030-bf44-01d23a7991e6
 # ╟─6e3d1343-c37c-4f2b-9faf-9f4f988c52e9
