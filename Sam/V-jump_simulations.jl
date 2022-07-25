@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.10
 
 using Markdown
 using InteractiveUtils
@@ -19,7 +19,7 @@ end
 begin 
 	using DiffEqProblemLibrary.JumpProblemLibrary
 	JumpProblemLibrary.importjumpproblems()
-end
+end;
 
 # ╔═╡ ceeace90-0b74-11ed-028d-316c8b46be70
 html"<button onclick=present()>Present</button>"
@@ -29,47 +29,6 @@ html"""<style>
 main {
     max-width: 900px;
 }
-"""
-
-# ╔═╡ 2f91617e-af68-4aa9-95ae-28d0e85bf419
-html"""
-<script>
-    const calculate_slide_positions = (/** @type {Event} */ e) => {
-        const notebook_node = /** @type {HTMLElement?} */ (e.target)?.closest("pluto-editor")?.querySelector("pluto-notebook")
-		console.log(e.target)
-        if (!notebook_node) return []
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
-        const pos = headers.map((el) => el.getBoundingClientRect())
-        const edges = pos.map((rect) => rect.top + window.pageYOffset)
-        edges.push(notebook_node.getBoundingClientRect().bottom + window.pageYOffset)
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const slideHeight = edges[i + 1] - edges[i] - height
-                return edges[i] - Math.max(0, (height - slideHeight) / 2)
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-        return scrollPositions
-    }
-    const go_previous_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.reverse().find((y) => y < window.pageYOffset - 10)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-    const go_next_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.pageYOffset)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-	const left_button = document.querySelector(".changeslide.prev")
-	const right_button = document.querySelector(".changeslide.next")
-	left_button.addEventListener("click", go_previous_slide)
-	right_button.addEventListener("click", go_next_slide)
-</script>
 """
 
 # ╔═╡ 6dff89b6-2da5-44d8-91d5-48eaf7c4538b
@@ -396,7 +355,6 @@ end
 # ╔═╡ Cell order:
 # ╟─ceeace90-0b74-11ed-028d-316c8b46be70
 # ╟─2522dd53-a78e-4fdf-a65e-8667c03d0054
-# ╟─2f91617e-af68-4aa9-95ae-28d0e85bf419
 # ╟─6dff89b6-2da5-44d8-91d5-48eaf7c4538b
 # ╠═89855cb1-eaac-4d35-b36a-9d317a4e6e1c
 # ╠═54a6ebb2-dcd3-4b2a-a376-e2eaa3dd7775

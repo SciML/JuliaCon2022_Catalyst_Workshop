@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.10
 
 using Markdown
 using InteractiveUtils
@@ -26,47 +26,6 @@ html"""<style>
 main {
     max-width: 900px;
 }
-"""
-
-# ╔═╡ 7cb53ff0-1751-4940-a4b3-bec68e81a005
-html"""
-<script>
-    const calculate_slide_positions = (/** @type {Event} */ e) => {
-        const notebook_node = /** @type {HTMLElement?} */ (e.target)?.closest("pluto-editor")?.querySelector("pluto-notebook")
-		console.log(e.target)
-        if (!notebook_node) return []
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
-        const pos = headers.map((el) => el.getBoundingClientRect())
-        const edges = pos.map((rect) => rect.top + window.pageYOffset)
-        edges.push(notebook_node.getBoundingClientRect().bottom + window.pageYOffset)
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const slideHeight = edges[i + 1] - edges[i] - height
-                return edges[i] - Math.max(0, (height - slideHeight) / 2)
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-        return scrollPositions
-    }
-    const go_previous_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.reverse().find((y) => y < window.pageYOffset - 10)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-    const go_next_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.pageYOffset)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-	const left_button = document.querySelector(".changeslide.prev")
-	const right_button = document.querySelector(".changeslide.next")
-	left_button.addEventListener("click", go_previous_slide)
-	right_button.addEventListener("click", go_next_slide)
-</script>
 """
 
 # ╔═╡ 32897144-3033-45bb-a878-f72f6882df20
@@ -681,7 +640,6 @@ md"Let's set some default initial values for the voltage and gating variables."
 # ╔═╡ Cell order:
 # ╟─192af62c-08fc-11ed-35a9-bb2a5d18c32f
 # ╟─45e2c3e6-ffc6-48d3-af95-320f19a0f5d6
-# ╟─7cb53ff0-1751-4940-a4b3-bec68e81a005
 # ╟─32897144-3033-45bb-a878-f72f6882df20
 # ╟─146fee58-6588-4bfc-94d9-cfa7302b59a0
 # ╠═3177b2e3-eefd-4faf-b292-2c7c6f0bbe22

@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.10
 
 using Markdown
 using InteractiveUtils
@@ -23,47 +23,6 @@ html"""<style>
 main {
     max-width: 900px;
 }
-"""
-
-# ╔═╡ 9f5d552a-5abe-4746-bf0c-b9a59078dcac
-html"""
-<script>
-    const calculate_slide_positions = (/** @type {Event} */ e) => {
-        const notebook_node = /** @type {HTMLElement?} */ (e.target)?.closest("pluto-editor")?.querySelector("pluto-notebook")
-		console.log(e.target)
-        if (!notebook_node) return []
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
-        const pos = headers.map((el) => el.getBoundingClientRect())
-        const edges = pos.map((rect) => rect.top + window.pageYOffset)
-        edges.push(notebook_node.getBoundingClientRect().bottom + window.pageYOffset)
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const slideHeight = edges[i + 1] - edges[i] - height
-                return edges[i] - Math.max(0, (height - slideHeight) / 2)
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-        return scrollPositions
-    }
-    const go_previous_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.reverse().find((y) => y < window.pageYOffset - 10)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-    const go_next_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.pageYOffset)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-	const left_button = document.querySelector(".changeslide.prev")
-	const right_button = document.querySelector(".changeslide.next")
-	left_button.addEventListener("click", go_previous_slide)
-	right_button.addEventListener("click", go_next_slide)
-</script>
 """
 
 # ╔═╡ 5b4f1bcf-cf28-4531-a273-5869fe7bc82b
@@ -346,7 +305,6 @@ md"#### See the [first Catalyst tutorial](https://catalyst.sciml.ai/dev/tutorial
 # ╔═╡ Cell order:
 # ╟─47323c44-09fe-11ed-0e8c-1b3df7e3b610
 # ╟─5eb4e150-9594-4de4-9016-259b4d84e694
-# ╟─9f5d552a-5abe-4746-bf0c-b9a59078dcac
 # ╟─5b4f1bcf-cf28-4531-a273-5869fe7bc82b
 # ╠═74931442-a55b-4331-b570-9c3a352e5cf4
 # ╠═f5188c47-4c58-46a6-8e93-2b9b7b5d575a
