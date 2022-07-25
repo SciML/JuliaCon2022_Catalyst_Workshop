@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.10
 
 using Markdown
 using InteractiveUtils
@@ -17,47 +17,6 @@ end
 
 # ╔═╡ 0dd82ade-f03f-4fa6-be3a-93be2aa84fef
 html"<button onclick=present()>Present</button>"
-
-# ╔═╡ 7db3edc6-0a8a-11ed-2367-a7af8e31d073
-html"""
-<script>
-    const calculate_slide_positions = (/** @type {Event} */ e) => {
-        const notebook_node = /** @type {HTMLElement?} */ (e.target)?.closest("pluto-editor")?.querySelector("pluto-notebook")
-		console.log(e.target)
-        if (!notebook_node) return []
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
-        const pos = headers.map((el) => el.getBoundingClientRect())
-        const edges = pos.map((rect) => rect.top + window.pageYOffset)
-        edges.push(notebook_node.getBoundingClientRect().bottom + window.pageYOffset)
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const slideHeight = edges[i + 1] - edges[i] - height
-                return edges[i] - Math.max(0, (height - slideHeight) / 2)
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-        return scrollPositions
-    }
-    const go_previous_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.reverse().find((y) => y < window.pageYOffset - 10)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-    const go_next_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.pageYOffset)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-	const left_button = document.querySelector(".changeslide.prev")
-	const right_button = document.querySelector(".changeslide.next")
-	left_button.addEventListener("click", go_previous_slide)
-	right_button.addEventListener("click", go_next_slide)
-</script>
-"""
 
 # ╔═╡ 4eb379f0-1492-4c5f-8e9d-2704eedf9602
 html"""<style>
@@ -280,11 +239,10 @@ end;
 
 # ╔═╡ Cell order:
 # ╟─0dd82ade-f03f-4fa6-be3a-93be2aa84fef
-# ╟─7db3edc6-0a8a-11ed-2367-a7af8e31d073
 # ╟─4eb379f0-1492-4c5f-8e9d-2704eedf9602
 # ╟─0649a89d-77f1-42f9-96e7-7f61cca954ea
-# ╟─e3b90e09-1613-4e48-8860-b50ac1c47fca
-# ╟─d214fb01-ce3a-44d5-a036-1d88c13a4e58
+# ╠═e3b90e09-1613-4e48-8860-b50ac1c47fca
+# ╠═d214fb01-ce3a-44d5-a036-1d88c13a4e58
 # ╟─ab7d1177-f46d-4cc1-be60-9fa78631189d
 # ╟─8777ec41-71c3-43e9-993f-4e4069890dcf
 # ╠═b064289b-14ae-4441-b871-369e1e41df8a

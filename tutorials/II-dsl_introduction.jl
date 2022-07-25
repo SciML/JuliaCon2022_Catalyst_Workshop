@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.10
 
 using Markdown
 using InteractiveUtils
@@ -17,47 +17,6 @@ end
 
 # ╔═╡ 37a68fe9-328d-4e10-84da-113dae3b1a9e
 html"<button onclick=present()>Present</button>"
-
-# ╔═╡ 3283a80a-09cc-11ed-2959-6525dd49b3fd
-html"""
-<script>
-    const calculate_slide_positions = (/** @type {Event} */ e) => {
-        const notebook_node = /** @type {HTMLElement?} */ (e.target)?.closest("pluto-editor")?.querySelector("pluto-notebook")
-		console.log(e.target)
-        if (!notebook_node) return []
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
-        const pos = headers.map((el) => el.getBoundingClientRect())
-        const edges = pos.map((rect) => rect.top + window.pageYOffset)
-        edges.push(notebook_node.getBoundingClientRect().bottom + window.pageYOffset)
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const slideHeight = edges[i + 1] - edges[i] - height
-                return edges[i] - Math.max(0, (height - slideHeight) / 2)
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-        return scrollPositions
-    }
-    const go_previous_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.reverse().find((y) => y < window.pageYOffset - 10)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-    const go_next_slide = (/** @type {Event} */ e) => {
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.pageYOffset)
-        if (pos) window.scrollTo(window.pageXOffset, pos)
-    }
-	const left_button = document.querySelector(".changeslide.prev")
-	const right_button = document.querySelector(".changeslide.next")
-	left_button.addEventListener("click", go_previous_slide)
-	right_button.addEventListener("click", go_next_slide)
-</script>
-"""
 
 # ╔═╡ 6ec927cc-a67b-44ba-b750-6947a1518dbc
 html"""<style>
@@ -324,13 +283,13 @@ In the logistic growth model, births are not constant, but depend on species con
 "
 
 # ╔═╡ 89d98e58-4e37-4e35-aadc-c75588213f20
-begin
-	logistic_growth_model = @reaction_network begin
+logistic_growth_model = @reaction_network begin
 		X, 0 --> X
 		d*X, X --> 0
-	end d
-	show_odes(logistic_growth_model)   
-end
+end d;
+
+# ╔═╡ fed3ab70-c366-4dd3-b508-b503572287aa
+show_odes(logistic_growth_model)   
 
 # ╔═╡ f7cb85e6-e336-487b-bbbd-799169102b9f
 md"
@@ -525,8 +484,8 @@ If you are using this feature extensively, it is likely that there is a better w
 
 # ╔═╡ 3f86541e-0307-4c3b-8bf2-65160b7a901a
 md"
-## Acessing the reaction system object
-The \"@reaction_network\" macro creaets a *ReactionSystem* structure, which we can investigate.
+## Accessing the reaction system object
+The \"@reaction_network\" macro creates a *ReactionSystem* structure, which we can investigate.
 "
 
 # ╔═╡ 68797a0a-59c3-4417-9758-19ea26e97a56
@@ -561,7 +520,7 @@ reactions(binding_model)
 
 # ╔═╡ 612fe079-5d2b-4244-95f8-6e67f93a542b
 md"
-# Excersise: Implement networks using the Catalyst DSL
+# Exercise: Implement networks using the Catalyst DSL
 Implement the following reaction networks using the Catalyst DSL. You can reveal the network box to see the network. If you use the same name for your model (optional input between \"@reaction_network\" and \"begin\"), you can check equality using \"==\". Try writing the network by combining similar reactions.
 "
 
@@ -609,7 +568,6 @@ end v K n d
 
 # ╔═╡ Cell order:
 # ╟─37a68fe9-328d-4e10-84da-113dae3b1a9e
-# ╟─3283a80a-09cc-11ed-2959-6525dd49b3fd
 # ╟─6ec927cc-a67b-44ba-b750-6947a1518dbc
 # ╟─76af30dd-f995-4a48-b922-76c2e84b1693
 # ╟─073c9ca2-7504-42ec-ad9f-e9e3014303f3
@@ -620,7 +578,7 @@ end v K n d
 # ╟─66e4e1c9-3678-4235-8bc6-71c24b1cd1d5
 # ╠═32ec973b-4e14-461a-bf30-7262265c0fe0
 # ╟─06d766b4-261b-46ac-a948-ea51ffe42572
-# ╠═a03aec3b-82c6-4dc6-b046-20f7f7b04c5f
+# ╟─a03aec3b-82c6-4dc6-b046-20f7f7b04c5f
 # ╟─fb29bcf8-e30c-4ff5-bed5-82314d371204
 # ╟─620f072c-1d4b-4ae3-895e-c792471502fe
 # ╠═c0ab7ba6-0437-44cc-85d9-af6d2753339a
@@ -655,6 +613,7 @@ end v K n d
 # ╟─b5153ab7-1e71-4ce2-8598-831c971df361
 # ╟─e7f19045-d570-4f0d-aa87-6c663aeed353
 # ╠═89d98e58-4e37-4e35-aadc-c75588213f20
+# ╟─fed3ab70-c366-4dd3-b508-b503572287aa
 # ╟─f7cb85e6-e336-487b-bbbd-799169102b9f
 # ╠═46239ac5-9981-4e71-9723-73e44d203dca
 # ╟─40dca2fe-500a-4b8a-8ba1-524fafadc5cc
