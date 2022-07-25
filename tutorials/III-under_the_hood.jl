@@ -230,8 +230,8 @@ end
 
 # ╔═╡ 57588fcd-a0c5-4be9-9687-56bdd15a6d35
 md"So we see we either 
-- Set `combinatoric_ratelaw=false` when creating an `ODEProblem` directly from a `ReactionSystem`.
-- Set `combinatoric_ratelaw=false` when creating an `ODESystem` from a `ReactionSystem`.
+- Set `combinatoric_ratelaws=false` when creating an `ODEProblem` directly from a `ReactionSystem`.
+- Set `combinatoric_ratelaws=false` when creating an `ODESystem` from a `ReactionSystem`.
 to drop the factorial scaling terms.
 "
 
@@ -296,8 +296,11 @@ md"is equivalent to "
 # ╔═╡ 82bb6f0c-2a9a-4942-9ebc-d971eea13fb4
 jsys = convert(JumpSystem, rn; combinatoric_ratelaws);
 
+# ╔═╡ ef362bd6-18e8-42e1-a7a1-00e069f8c9c8
+dprob2 = DiscreteProblem(jsys, u₀MT, tspan, pMT);
+
 # ╔═╡ 5285aead-f558-4eee-a1f2-6a521ec4716d
-jprob2 = JumpProblem(jsys, dprob, Direct());
+jprob2 = JumpProblem(jsys, dprob2, Direct());
 
 # ╔═╡ 48678636-1c58-46b3-a91c-8ce0aa1443db
 md"#### See the [first Catalyst tutorial](https://catalyst.sciml.ai/dev/tutorials/using_catalyst/#Reaction-rate-laws-used-in-simulations) for more information!"
@@ -352,5 +355,6 @@ md"#### See the [first Catalyst tutorial](https://catalyst.sciml.ai/dev/tutorial
 # ╠═19ccc574-0f36-496f-abc4-c35821c4e662
 # ╟─4fceb9bf-51fa-423a-992e-1966abbbad8e
 # ╠═82bb6f0c-2a9a-4942-9ebc-d971eea13fb4
+# ╠═ef362bd6-18e8-42e1-a7a1-00e069f8c9c8
 # ╠═5285aead-f558-4eee-a1f2-6a521ec4716d
 # ╟─48678636-1c58-46b3-a91c-8ce0aa1443db
