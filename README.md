@@ -13,4 +13,4 @@ Pluto.run()
 ```
 4. At this point Pluto should open in your web browser, and you can load any of the workshop notebooks.
 
-Note, these tutorials use Catalyst 12.1.3.
+Note, these tutorials use Catalyst 12.1.3 and reauire Julia 1.8 or newer.
