@@ -19,3 +19,6 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 StochasticDiffEq = "789caeaf-c7a9-5a7d-9973-96adeb23e2a0"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
+[compat]
+julia = "1.8"
