@@ -69,7 +69,7 @@ end
 # ╔═╡ 1e81937b-b71d-48a7-bdce-1a3f612c35be
 md"# What's going on under the hood?
 Let's look at what happens when we create various problem types, like `ODEProblem`, from a Catalyst reaction model. We'll focus on
-- Default reaction rate laws and `ModelingtToolkit.ODESystem`
+- Default reaction rate laws and `ModelingToolkit.ODESystem`
 - Alternative rate laws via the `combinatoric_ratelaws=false` option.
 - Other ModelingToolkit system types.
 "
