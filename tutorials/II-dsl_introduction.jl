@@ -139,7 +139,7 @@ show_odes(stoich_example_model)
 # ╔═╡ 3f1c0b3c-f988-4180-b637-ba6e11f8ada8
 md"
 # Bundling of similar reactions
-Many CRNs contain nearly identical reactions, these can often be bundles to provide more concise notation.
+Many CRNs contain nearly identical reactions, these can often be bundled to provide more concise notation.
 "
 
 # ╔═╡ 7cfadb90-4283-4471-b707-373b01aa4fd8
@@ -293,7 +293,7 @@ show_odes(logistic_growth_model)
 
 # ╔═╡ f7cb85e6-e336-487b-bbbd-799169102b9f
 md"
-A biochemical reaction often requires the presence of a Catalyst, which is also a biochemical species:
+A biochemical reaction often requires the presence of a catalyst, which is also a biochemical species:
 "
 
 # ╔═╡ 46239ac5-9981-4e71-9723-73e44d203dca
@@ -303,7 +303,7 @@ end k;
 
 # ╔═╡ 40dca2fe-500a-4b8a-8ba1-524fafadc5cc
 md"
-Note that here, the Catalyst (*C*), is a species of the system, which is neither produced nor degraded:
+Note that here, the catalyst (*C*), is a species of the system, which is neither produced nor degraded:
 "
 
 # ╔═╡ b4f94075-900c-478c-98f2-5dcbe366c5da
@@ -525,7 +525,7 @@ Implement the following reaction networks using the Catalyst DSL. You can reveal
 "
 
 # ╔═╡ 66728203-e607-4b03-8520-85c2864b89ec
-excersise_rn_1 = @reaction_network ern1 begin
+exercise_rn_1 = @reaction_network ern1 begin
 	p, 0 --> (X,Y)
 	d, (X,Y) --> 0
 	(kB,kD), X + Y <--> XY
@@ -534,11 +534,11 @@ end p d kB kD
 # ╔═╡ e75d0780-28f9-4578-8cad-f52736cd2160
 # answer_rn_1 = @reaction_network ern1 begin
 # 	 # Write network here.
-# end 
-# answer_rn_1 == excersise_rn_1
+# end
+# answer_rn_1 == exercise_rn_1
 
 # ╔═╡ 65f61e36-7794-41c2-b04f-1422ffd45870
-excersise_rn_2 = @reaction_network ern2 begin
+exercise_rn_2 = @reaction_network ern2 begin
 	b, S + I --> 2I
 	k, I --> R
 end b k
@@ -547,7 +547,7 @@ end b k
 
 
 # ╔═╡ 8899e7dd-8635-45d6-9e96-c86d6a0c91b0
-excersise_rn_3 = @reaction_network ern3 begin
+exercise_rn_3 = @reaction_network ern3 begin
 	(p,d), 0 <--> C
 	mm(C,v,K), S --> P
 end p d v K
@@ -556,7 +556,7 @@ end p d v K
 
 
 # ╔═╡ 6c4881a5-f6ba-45cb-aaa4-376bb78e8050
-excersise_rn_4 = @reaction_network ern4 begin
+exercise_rn_4 = @reaction_network ern4 begin
 	hill(K,v,Z,n), 0 --> X
 	hill(K,v,X,n), 0 --> Y
 	hill(K,v,Y,n), 0 --> Z
