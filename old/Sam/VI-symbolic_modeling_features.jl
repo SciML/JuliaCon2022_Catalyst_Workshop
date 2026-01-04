@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, ModelingToolkit, DifferentialEquations, Plots, GraphRecipes, IfElse, NonlinearSolve
+    using Catalyst, ModelingToolkit, DifferentialEquations, Plots, GraphRecipes, IfElse, NonlinearSolve
 end
 
 # ╔═╡ bcdd2649-93c4-4d20-a4f6-e4437b8b842b
@@ -59,17 +59,19 @@ md"Package setup:"
 # ╔═╡ d35195ef-de7a-4f4c-8a38-ca9b4ec1b742
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ dbfd836f-d475-48e7-9afd-8f02d9785f42
@@ -90,11 +92,11 @@ Let's see how we can define the Oregonator model via the symbolic interface. Fir
 
 # ╔═╡ 6c8e9c23-eca9-4b91-8391-8eefeb3b3745
 rn = @reaction_network oregonator begin
-	k₁, X + Y --> ∅
-	k₂, Y --> X
-	k₃, X --> 2X + Z
-	k₄, 2X --> ∅
-	k₅, Z --> Y
+    k₁, X + Y --> ∅
+    k₂, Y --> X
+    k₃, X --> 2X + Z
+    k₄, 2X --> ∅
+    k₅, Z --> Y
 end k₁ k₂ k₃ k₄ k₅
 
 # ╔═╡ 0c4f8cd6-b05e-4386-956f-9eaa404ab656
@@ -102,12 +104,12 @@ md"Let's first take a quick look at what the ODE solutions look like:"
 
 # ╔═╡ 1cb68f8a-e33e-4c67-90d6-94f51e6dafab
 let
-	u₀ = [:X => 500, :Y => 1000, :Z => 2100]
-	p = [:k₁ => .1, :k₂ => 2.0, :k₃ => 104.0, :k₄ => .016, :k₅ => 26.0]
-	tspan = (0.0, 5.0)
-	oprob = ODEProblem(rn, u₀, tspan, p)
-	sol = solve(oprob, Tsit5())
-	plot(sol)
+    u₀ = [:X => 500, :Y => 1000, :Z => 2100]
+    p = [:k₁ => 0.1, :k₂ => 2.0, :k₃ => 104.0, :k₄ => 0.016, :k₅ => 26.0]
+    tspan = (0.0, 5.0)
+    oprob = ODEProblem(rn, u₀, tspan, p)
+    sol = solve(oprob, Tsit5())
+    plot(sol)
 end
 
 # ╔═╡ 7cd8a85f-d5fd-45dd-8254-941d7b6afabd
@@ -127,13 +129,13 @@ md"We next define our state variables, the species populations"
 md"We have now constructed [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl) symbolic parameters and variables we can manipulate in Julia using [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl):"
 
 # ╔═╡ 8ff33d17-902c-44bb-ba24-9e89c06fb887
-ex = (X^2 - 2*X + 1) / (X-1)
+ex = (X^2 - 2 * X + 1) / (X - 1)
 
 # ╔═╡ d9393282-8389-43af-8ab9-f9d9f3943cad
 ex2 = simplify(ex)
 
 # ╔═╡ bf439579-ab39-4e3e-9c1d-0d71ac7d8b9e
-substitute(ex2, Dict((X-1) => Y))
+substitute(ex2, Dict((X - 1) => Y))
 
 # ╔═╡ a052955b-e291-4618-9ff5-df9dd630d753
 md"Now we can construct each reaction in the Oregonator symbolically in two ways. Let's recall our reactions:"
@@ -145,11 +147,13 @@ rn
 md"Symbolic method 1:"
 
 # ╔═╡ e1266df7-84bf-48d5-ac2d-e1dec70ed7e4
-rxs = [Reaction(k₁, [X, Y], nothing),
-	   Reaction(k₂, [Y], [X]),
-	   Reaction(k₃, [X], [X, Z], [1], [2,1]),
-	   Reaction(k₄, [X], nothing, [2], nothing),
-	   Reaction(k₅, [Z], [Y])]
+rxs = [
+    Reaction(k₁, [X, Y], nothing),
+    Reaction(k₂, [Y], [X]),
+    Reaction(k₃, [X], [X, Z], [1], [2, 1]),
+    Reaction(k₄, [X], nothing, [2], nothing),
+    Reaction(k₅, [Z], [Y]),
+]
 
 # ╔═╡ 1321fde4-c779-4720-9fc1-803503f18bab
 md"Notice the general format is
@@ -162,11 +166,13 @@ Catalyst also provides a simple macro that can be used to write reactions in the
 "
 
 # ╔═╡ 2799b012-76c2-474e-ac57-d11f0320c7fc
-rxs2 = [(@reaction k₁, X + Y --> ∅),
-	    (@reaction k₂, Y --> X),
-	    (@reaction k₃, X --> 2X + Z),
-	    (@reaction k₄, 2X --> ∅),
-	    (@reaction k₅, Z --> Y)]
+rxs2 = [
+    (@reaction k₁, X + Y --> ∅),
+    (@reaction k₂, Y --> X),
+    (@reaction k₃, X --> 2X + Z),
+    (@reaction k₄, 2X --> ∅),
+    (@reaction k₅, Z --> Y)
+]
 
 # ╔═╡ 250980aa-9e10-4b74-93f4-f408c3740d8d
 md"Let's check the two reaction lists are equivalent:"
@@ -233,26 +239,28 @@ To make Distributions' geometric distribution accessible in Symbolics.jl express
 @register_symbolic Geometric(b)
 
 # ╔═╡ b4ad6737-55d8-417c-bc31-04898807089b
-m = rand(Geometric(1/b)) + 1
+m = rand(Geometric(1 / b)) + 1
 
 # ╔═╡ 7f6e982b-8710-4d1a-84ee-0ed77e568a8c
 md"This corresponds to a symbolic variable that when evaluated generates a sample from the Geometric Distribution with mean `b`, note we shift by one to obtain a sample from the Shifted Geometric Distribution!"
 
 # ╔═╡ 306bcb0c-5134-4e50-a72a-5d559a1726d7
-burstyrxs = [Reaction(k, nothing, [P], nothing, [m]),
-			 Reaction(γ, [P], nothing)]
+burstyrxs = [
+    Reaction(k, nothing, [P], nothing, [m]),
+    Reaction(γ, [P], nothing),
+]
 
 # ╔═╡ a5277543-582d-4958-80f4-1f43857601a0
 @named burstygene = ReactionSystem(burstyrxs, t)
 
 # ╔═╡ 63fd312f-50da-46e5-934a-6deacfbd474a
-burstysol = let 
-	p = [:k => 10.0, :γ => 1.0, :b => 10]
-	u₀ =[:P => 0]
-	tspan = (0., 2) 
-	dprob = DiscreteProblem(burstygene, u₀, tspan, p)
-	jprob = JumpProblem(burstygene, dprob, Direct())
-	sol = solve(jprob, SSAStepper())
+burstysol = let
+    p = [:k => 10.0, :γ => 1.0, :b => 10]
+    u₀ = [:P => 0]
+    tspan = (0.0, 2)
+    dprob = DiscreteProblem(burstygene, u₀, tspan, p)
+    jprob = JumpProblem(burstygene, dprob, Direct())
+    sol = solve(jprob, SSAStepper())
 end
 
 # ╔═╡ cbb87922-da86-494e-8e46-7ecbad29f432
@@ -261,7 +269,7 @@ md"Suppose we just want to plot `P`, we can use symbolic indexing with `sol` to 
 1. We just use `burstygene.P` to access the symbolic variable:"
 
 # ╔═╡ ff6cd1cf-3753-4f93-94e1-dbbaccf97aa8
-plot(burstysol, vars=burstygene.P, legend=:bottomright)
+plot(burstysol, vars = burstygene.P, legend = :bottomright)
 
 # ╔═╡ 1da19c48-9532-4e48-9bd5-ce968e3de493
 md"
@@ -269,8 +277,8 @@ md"
 
 # ╔═╡ edd33cf5-b00e-4b13-bdfe-175cb01f6822
 let
-	@unpack P = burstygene
-	plot(burstysol, vars=P)
+    @unpack P = burstygene
+    plot(burstysol, vars = P)
 end
 
 # ╔═╡ 92c7f19d-9299-488e-87e9-76c68fe26405
@@ -278,8 +286,8 @@ md"3. We just create a symbolic variable named `P(t)` from scratch and use it"
 
 # ╔═╡ e7a89226-4757-42c1-825a-b117ae439c1e
 let
-	@variables P(t)
-	plot(burstysol, vars=P)
+    @variables P(t)
+    plot(burstysol, vars = P)
 end
 
 # ╔═╡ 9252661d-6fb8-47fb-805d-895f228df4e2
@@ -287,8 +295,8 @@ md"We can use each of these to access the solution at specific times too, for ex
 
 # ╔═╡ 03ce0b66-6860-4f8b-9f22-ec9ffaec60d1
 u = let
-	tv = collect(range(0, 1, length=10))
-	burstysol(tv, idxs=P)
+    tv = collect(range(0, 1, length = 10))
+    burstysol(tv, idxs = P)
 end
 
 # ╔═╡ 4430dc04-3a31-408c-85d9-1efe36c088d1
@@ -306,12 +314,12 @@ md"## _*Interpolation into the DSL*_
 
 # ╔═╡ 60263535-9291-483f-b28e-fc8c26f4019f
 burstygene2 = let
-	@parameters b
-	m = 1 + rand(Geometric(1/b))
-	@reaction_network burstygene begin
-		k, ∅ --> $m*P
-		γ, P --> ∅
-	end k γ	
+    @parameters b
+    m = 1 + rand(Geometric(1 / b))
+    @reaction_network burstygene begin
+        k, ∅ --> $m * P
+        γ, P --> ∅
+    end k γ
 end
 
 # ╔═╡ 121b11c2-aadc-4e73-871a-d6c79c8fa3d9
@@ -333,9 +341,9 @@ For example,
 
 # ╔═╡ a891e0ce-0cf5-4e5e-9ffb-b8cf257dd750
 let
-	@parameters b
-	f(x) = 1 + x^3
-	f(b)
+    @parameters b
+    f(x) = 1 + x^3
+    f(b)
 end
 
 # ╔═╡ 82ac4773-4320-4683-85d1-8bdc0f5a77a3
@@ -345,18 +353,18 @@ md"works, but"
 md"fails. If we register it though it will be usable:"
 
 # ╔═╡ 771e0080-a6d4-4de8-a7ec-3bb3949fc57f
-let 
-	# this is needed to define a version of it for symbolic variables
-	import Base: round   
-	@parameters b
-	@register_symbolic round(x)
-	round(b)
+let
+    # this is needed to define a version of it for symbolic variables
+    import Base: round
+    @parameters b
+    @register_symbolic round(x)
+    round(b)
 end
 
 # ╔═╡ 5535c9cc-bb87-4046-8621-93214829a012
 let
-	@parameters b
-	round(b)
+    @parameters b
+    round(b)
 end
 
 # ╔═╡ 09d51be7-0972-4701-bfd7-471b207f518d
@@ -377,13 +385,13 @@ Let's see how each works
 
 # ╔═╡ fac7b265-4802-4fa2-87b8-a08a57e6ec6c
 basern = @reaction_network rn1 begin
-           k, A + B --> C
-         end k
+    k, A + B --> C
+end k
 
 # ╔═╡ becb9021-3e24-47a3-8893-3e5a55242958
 newrn = @reaction_network rn2 begin
-        r, C --> A + B
-      end r
+    r, C --> A + B
+end r
 
 # ╔═╡ 489b6939-5505-4bf7-8e5f-1a48ae4e6fe4
 @named extended_network = extend(newrn, basern)
@@ -398,8 +406,8 @@ Let's make one more network to help us see how this works
 
 # ╔═╡ 0d736c32-602f-41c6-a5a4-0116879cd18c
 newestrn = @reaction_network rn3 begin
-            v, A + D --> 2D
-           end v
+    v, A + D --> 2D
+end v
 
 # ╔═╡ 5c96f8dc-1932-4aea-a38b-9bd5b1a0e9d5
 @named composed_network = compose(basern, [newrn, newestrn])
@@ -408,7 +416,7 @@ newestrn = @reaction_network rn3 begin
 md"Conceptually, we can think of `newrn` and `newestrn` as sub-systems in a tree, where `basern` is the root. We can visualize this like:"
 
 # ╔═╡ 44eec599-dd11-4543-bf13-11d880edddf6
-plot(TreePlot(composed_network), method=:tree, fontsize=12, nodeshape=:ellipse)
+plot(TreePlot(composed_network), method = :tree, fontsize = 12, nodeshape = :ellipse)
 
 # ╔═╡ 570586d3-0192-4f2c-acbc-3cc55cb3c834
 md"We can get the sub-systems of `composed_network` like"
@@ -449,23 +457,25 @@ Let's see how we can use compositional modeling to build and simulate the repres
 
 # ╔═╡ b30d2470-fd4a-4f6b-a7e6-9cdfb6ed3be1
 function repressed_gene(; R, name)
-	rn = @reaction_network $name begin
-		hillr($R,α,K,n), ∅ --> m
-        (δ,γ), m <--> ∅
+    rn = @reaction_network $name begin
+        hillr($R, α, K, n), ∅ --> m
+        (δ, γ), m <--> ∅
         β, m --> m + P
         μ, P --> ∅
     end α K n δ γ β μ
 
-	# here we set default values for the parameters in rn
-	p = (:α => .5, :K => 40, :n => 2, :δ => log(2)/120,
-         :γ => 5e-3, :β => log(2)/6, :μ => log(2)/60)
+    # here we set default values for the parameters in rn
+    p = (
+        :α => 0.5, :K => 40, :n => 2, :δ => log(2) / 120,
+        :γ => 5.0e-3, :β => log(2) / 6, :μ => log(2) / 60,
+    )
 
-	# here we set default values for the initial conditions in rn
-	setdefaults!(rn, p)
-	u₀ = [:m => 0., :P => 0.0]
-	setdefaults!(rn, u₀)
+    # here we set default values for the initial conditions in rn
+    setdefaults!(rn, p)
+    u₀ = [:m => 0.0, :P => 0.0]
+    setdefaults!(rn, u₀)
 
-	rn
+    return rn
 end
 
 # ╔═╡ 4308a174-67c8-4356-85d3-c7c41e0df85b
@@ -480,33 +490,33 @@ md"
 @variables G3₊P(t)
 
 # ╔═╡ 32c21d52-6501-468f-9c31-2e2681497851
-@named G1 = repressed_gene(; R=ParentScope(G3₊P))
+@named G1 = repressed_gene(; R = ParentScope(G3₊P))
 
 # ╔═╡ 185fe648-c485-4ab9-bbfc-3e3d8496ad39
 md"Here `ParentScope(G3₊P)` tells ModelingToolkit that the variable `G3₊P` is coming from one level higher in the system hierarchy."
 
 # ╔═╡ bfe77918-a87c-48b7-8d09-9f4bf4182523
-@named G2 = repressed_gene(; R=ParentScope(G1.P))
+@named G2 = repressed_gene(; R = ParentScope(G1.P))
 
 # ╔═╡ fbe9c85d-3e8c-4ab0-99a8-5271d00cb86e
-@named G3 = repressed_gene(; R=ParentScope(G2.P))
+@named G3 = repressed_gene(; R = ParentScope(G2.P))
 
 # ╔═╡ 41d06379-00a2-468f-a951-6d4f432a841b
-@named repressilator = ReactionSystem(t; systems=[G1,G2,G3])
+@named repressilator = ReactionSystem(t; systems = [G1, G2, G3])
 
 # ╔═╡ ee7afe3c-4989-4dd5-8706-a9ee523a36b7
-plot(TreePlot(repressilator), method=:tree, fontsize=12, nodeshape=:ellipse)
+plot(TreePlot(repressilator), method = :tree, fontsize = 12, nodeshape = :ellipse)
 
 # ╔═╡ 095a5aff-4aa9-4138-bec5-0f8ee5d37399
 md"Let's make the first gene have some protein initially, and then simulate the model:"
 
 # ╔═╡ 9329d5b9-d9f3-4bbf-a6de-24cea133ccbb
 let
-	u0 = [G1.P => 20.0]
-	tspan = (0.0, 10000.0)
-	oprob = ODEProblem(repressilator, u0, tspan)
-	sol = solve(oprob, Tsit5())
-	plot(sol)
+    u0 = [G1.P => 20.0]
+    tspan = (0.0, 10000.0)
+    oprob = ODEProblem(repressilator, u0, tspan)
+    sol = solve(oprob, Tsit5())
+    plot(sol)
 end
 
 # ╔═╡ 88350aaf-530d-49ef-a2d2-c1ce2eeb226a
@@ -528,21 +538,21 @@ The transition rate functions, which depend on the voltage, ``V(t)``, are then
 "
 
 # ╔═╡ 1b16a199-ffae-45e5-8528-21f05c4d3432
-begin 
-	function αₘ(V) 
-		theta = (V + 45) / 10
-		IfElse.ifelse(theta == 0.0, 1.0, theta/(1 - exp(-theta)))
-	end
-	βₘ(V) = 4*exp(-(V + 70)/18)
-	
-	αₕ(V) = .07 * exp(-(V + 70)/20)
-	βₕ(V) = 1/(1 + exp(-(V + 40)/10))
-	
-	function αₙ(V)
-		theta = (V + 60) / 10
-		IfElse.ifelse(theta == 0.0, .1, .1*theta / (1 - exp(-theta)))
-	end
-	βₙ(V) = .125 * exp(-(V + 70)/80)
+begin
+    function αₘ(V)
+        theta = (V + 45) / 10
+        return IfElse.ifelse(theta == 0.0, 1.0, theta / (1 - exp(-theta)))
+    end
+    βₘ(V) = 4 * exp(-(V + 70) / 18)
+
+    αₕ(V) = 0.07 * exp(-(V + 70) / 20)
+    βₕ(V) = 1 / (1 + exp(-(V + 40) / 10))
+
+    function αₙ(V)
+        theta = (V + 60) / 10
+        return IfElse.ifelse(theta == 0.0, 0.1, 0.1 * theta / (1 - exp(-theta)))
+    end
+    βₙ(V) = 0.125 * exp(-(V + 70) / 80)
 end
 
 # ╔═╡ 10c8bca1-7f9f-457e-a19f-fc60d358317c
@@ -555,13 +565,13 @@ Aside: `bcspecies` means a boundary condition species, a terminology from SBML.
 "
 
 # ╔═╡ 5390f023-b554-43be-b4f7-1738a3a2cab3
-@variables V(t) [isbcspecies=true]
+@variables V(t) [isbcspecies = true]
 
 # ╔═╡ fea64be0-3d41-4714-8690-fbd5df42c246
 hhrn = @reaction_network hhmodel begin
-	(αₙ($V),βₙ($V)), n′ <--> n
-	(αₘ($V),βₘ($V)), m′ <--> m
-	(αₕ($V),βₕ($V)), h′ <--> h
+    (αₙ($V), βₙ($V)), n′ <--> n
+    (αₘ($V), βₘ($V)), m′ <--> m
+    (αₕ($V), βₕ($V)), h′ <--> h
 end
 
 # ╔═╡ b87af1c6-02b6-4981-9da4-c850c25d10eb
@@ -569,13 +579,13 @@ md"Next we create a `ModelingToolkit.ODESystem` to store the equation for `dV/dt
 
 # ╔═╡ 0aa27dc1-8331-4d6a-8cf7-b15c91300458
 voltageode = let
-	@parameters C=1.0 ḡNa=120.0 ḡK=36.0 ḡL=.3 ENa=45.0 EK=-82.0 EL=-59.0 I₀=0.0
-	@variables m(t) n(t) h(t)
-	I = I₀* sin(2*pi*t/30)^2 
+    @parameters C = 1.0 ḡNa = 120.0 ḡK = 36.0 ḡL = 0.3 ENa = 45.0 EK = -82.0 EL = -59.0 I₀ = 0.0
+    @variables m(t) n(t) h(t)
+    I = I₀ * sin(2 * pi * t / 30)^2
 
-	Dₜ = Differential(t)
-	eqs = [Dₜ(V) ~ -1/C * (ḡK*n^4*(V-EK) + ḡNa*m^3*h*(V-ENa) + ḡL*(V-EL)) + I/C]
-	@named voltageode = ODESystem(eqs, t)
+    Dₜ = Differential(t)
+    eqs = [Dₜ(V) ~ -1 / C * (ḡK * n^4 * (V - EK) + ḡNa * m^3 * h * (V - ENa) + ḡL * (V - EL)) + I / C]
+    @named voltageode = ODESystem(eqs, t)
 end
 
 # ╔═╡ 07537b15-68e7-4642-8e8c-d5001b564101
@@ -594,15 +604,17 @@ md"
 
 # ╔═╡ 0c2af32c-70fc-4ed9-9673-601dc4191f24
 hhsssol = let
-	tspan = (0.0, 50.0)
-	u₀ = [:V => -70, :m => 0.0, :h => 0.0, :n => 0.0, 
-		  :m′ => 1.0, :n′ => 1.0, :h′ => 1.0]
-	oprob = ODEProblem(hhmodel, u₀, tspan)
-	sol = solve(oprob, Rosenbrock23())	
+    tspan = (0.0, 50.0)
+    u₀ = [
+        :V => -70, :m => 0.0, :h => 0.0, :n => 0.0,
+        :m′ => 1.0, :n′ => 1.0, :h′ => 1.0,
+    ]
+    oprob = ODEProblem(hhmodel, u₀, tspan)
+    sol = solve(oprob, Rosenbrock23())
 end;
 
 # ╔═╡ 7bcb71ea-5c83-4680-804e-79d2754d7b91
-plot(hhsssol, vars=V)
+plot(hhsssol, vars = V)
 
 # ╔═╡ b05cfc61-e815-4684-8014-bda19c9aef0e
 u_ss = hhsssol.u[end]
@@ -612,11 +624,11 @@ md"Finally, starting from this resting state let's solve the system when the amp
 
 # ╔═╡ b16c5e12-32ac-4e40-8185-35efb1221b50
 let
-	tspan = (0.0, 50.0)
-	@unpack I₀ = hhmodel
-	oprob = ODEProblem(hhmodel, u_ss, tspan, [I₀ => 10.0])
-	sol = solve(oprob)
-	plot(sol, vars=V, legend=:outerright)
+    tspan = (0.0, 50.0)
+    @unpack I₀ = hhmodel
+    oprob = ODEProblem(hhmodel, u_ss, tspan, [I₀ => 10.0])
+    sol = solve(oprob)
+    plot(sol, vars = V, legend = :outerright)
 end
 
 # ╔═╡ 7a065cca-ffac-47cb-bc29-c00237d6936a

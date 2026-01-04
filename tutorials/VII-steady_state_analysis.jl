@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, BifurcationKit, Setfield, LinearAlgebra, HomotopyContinuation, Plots
+    using Catalyst, BifurcationKit, Setfield, LinearAlgebra, HomotopyContinuation, Plots
 end
 
 # ╔═╡ 0dd82ade-f03f-4fa6-be3a-93be2aa84fef
@@ -53,17 +53,19 @@ md"
 # ╔═╡ d214fb01-ce3a-44d5-a036-1d88c13a4e58
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ ab7d1177-f46d-4cc1-be60-9fa78631189d
@@ -79,7 +81,7 @@ We will use the positive feedback model, which we already suspect might be bista
 
 # ╔═╡ b064289b-14ae-4441-b871-369e1e41df8a
 pos_feedback_model = @reaction_network begin
-    v0 + hill(i*X,v,K,n), ∅ → X
+    v0 + hill(i * X, v, K, n), ∅ → X
     d, X → ∅
 end i v0 v K n d;
 
@@ -90,10 +92,10 @@ Next, we extract the ODE function in a form that BifurcationKit can appreciate.
 
 # ╔═╡ 0fbfcbd4-fdb0-4b4a-bf5f-9254aa08638a
 begin
-	odefun = ODEFunction(convert(ODESystem,pos_feedback_model),jac=true)
-	F = (u,p) -> odefun(u,p,0)      
-	J = (u,p) -> odefun.jac(u,p,0)
-	jet = BifurcationKit.getJet(F, J; matrixfree=false)
+    odefun = ODEFunction(convert(ODESystem, pos_feedback_model), jac = true)
+    F = (u, p) -> odefun(u, p, 0)
+    J = (u, p) -> odefun.jac(u, p, 0)
+    jet = BifurcationKit.getJet(F, J; matrixfree = false)
 end;
 
 # ╔═╡ f02d05b5-ec3f-4087-b4ff-fb9dc3c4d830
@@ -103,9 +105,9 @@ We have to designate the parameter set for which we want to compute our bifurcat
 
 # ╔═╡ 6df3870e-38fc-40a6-967a-02f0d37f443f
 begin
-	params = [0.5,0.1,10.0,0.5,2,1.0]
-	bif_par_idx = 1
-	p_span = (0.0,1.0)
+    params = [0.5, 0.1, 10.0, 0.5, 2, 1.0]
+    bif_par_idx = 1
+    p_span = (0.0, 1.0)
 end;
 
 # ╔═╡ 1ed9f8a1-4661-4ed1-96b2-8d50ce68f06f
@@ -122,9 +124,10 @@ To ensure the diagram is plotted across the whole parameter range, we need to mo
 "
 
 # ╔═╡ 6a43f65e-5817-436a-8381-1dde21e606ae
-begin\
-	bif_params = copy(params)
-	bif_params[bif_par_idx] = p_span[1]
+begin
+    \
+    bif_params = copy(params)
+    bif_params[bif_par_idx] = p_span[1]
 end;
 
 # ╔═╡ 03c706e8-6c92-43f1-b516-6672ae9ec041
@@ -142,9 +145,10 @@ Next, we need to set our continuation parameters. These are used when the bifurc
 
 # ╔═╡ 2282c4f1-50a1-402b-920d-723fdeffee18
 opts_br = ContinuationPar(
-		pMin=p_span[1], pMax=p_span[2],
-		dsmax = 1e-2, dsmin = 1e-5, ds=1e-3, maxSteps=1000,
-		detectBifurcation=3);
+    pMin = p_span[1], pMax = p_span[2],
+    dsmax = 1.0e-2, dsmin = 1.0e-5, ds = 1.0e-3, maxSteps = 1000,
+    detectBifurcation = 3
+);
 
 # ╔═╡ 9de0ecc6-9bc6-40b3-9978-48c8143d3a3a
 md"
@@ -152,10 +156,12 @@ We can now compute the bifurcation diagram:
 "
 
 # ╔═╡ 822ab1af-b7f9-4204-a2aa-ab5da9e47e8e
-bif_dia = bifurcationdiagram(jet..., u0, bif_params, (@lens _[bif_par_idx]), 2,
-                (x,p,level)->setproperties(opts_br);
-                tangentAlgo = BorderedPred(),
-                recordFromSolution=(x, p) -> x[plot_var_idx], verbosity = 0, plot=false);
+bif_dia = bifurcationdiagram(
+    jet..., u0, bif_params, (@lens _[bif_par_idx]), 2,
+    (x, p, level) -> setproperties(opts_br);
+    tangentAlgo = BorderedPred(),
+    recordFromSolution = (x, p) -> x[plot_var_idx], verbosity = 0, plot = false
+);
 
 # ╔═╡ b394fa10-9cd5-4bcf-9791-0ee431fc70ec
 md"
@@ -178,16 +184,19 @@ This approach only works if the bifurcation diagram can be tracked as one contin
 
 # ╔═╡ 586f9f1e-1e53-4091-839f-b301e0683437
 let
-	p_span = (0.0,0.2)
-	opts_br = ContinuationPar(
-			pMin=p_span[1], pMax=p_span[2],
-			dsmax = 1e-2, dsmin = 1e-5, ds=1e-3, maxSteps=1000,
-			detectBifurcation=3);
-	bif_dia = bifurcationdiagram(jet..., u0, bif_params, (@lens _[bif_par_idx]), 2,
-	                (x,p,level)->setproperties(opts_br);
-	                tangentAlgo = BorderedPred(),
-	                recordFromSolution=(x, p) -> x[plot_var_idx], verbosity = 0, plot=false);
-	plot(bif_dia)
+    p_span = (0.0, 0.2)
+    opts_br = ContinuationPar(
+        pMin = p_span[1], pMax = p_span[2],
+        dsmax = 1.0e-2, dsmin = 1.0e-5, ds = 1.0e-3, maxSteps = 1000,
+        detectBifurcation = 3
+    )
+    bif_dia = bifurcationdiagram(
+        jet..., u0, bif_params, (@lens _[bif_par_idx]), 2,
+        (x, p, level) -> setproperties(opts_br);
+        tangentAlgo = BorderedPred(),
+        recordFromSolution = (x, p) -> x[plot_var_idx], verbosity = 0, plot = false
+    )
+    plot(bif_dia)
 end
 
 # ╔═╡ 8b1b0583-85ea-404f-8703-4c0cc1e77662
@@ -203,13 +212,13 @@ We use a model from the Wilhem (2009) paper (which demonstrates bistability in a
 
 # ╔═╡ ff2eaf0a-074a-4401-8a55-9d1756c29474
 begin
-	wilhelm_2009_model = @reaction_network begin
-	    k1, Y --> 2X
-	    k2, 2X --> X + Y
-	    k3, X + Y --> Y
-	    k4, X --> 0
-	end k1 k2 k3 k4
-	p = [:k1 => 8.0, :k2 => 2.0, :k3 => 1.0, :k4 => 1.5]
+    wilhelm_2009_model = @reaction_network begin
+        k1, Y --> 2X
+        k2, 2X --> X + Y
+        k3, X + Y --> Y
+        k4, X --> 0
+    end k1 k2 k3 k4
+    p = [:k1 => 8.0, :k2 => 2.0, :k3 => 1.0, :k4 => 1.5]
 end;
 
 # ╔═╡ d3a3784c-76e9-4752-87a3-f02409ae339e
@@ -219,9 +228,9 @@ Next, we need to extract the system which we need to solve to find the steady st
 
 # ╔═╡ c8b94894-0ca7-4997-866b-ea092ae29105
 begin
-	ns = convert(NonlinearSystem,wilhelm_2009_model)
-	subs = Dict(Pair.(wilhelm_2009_model.ps.value,last.(p)))
-	new_eqs = map(eq -> ModelingToolkit.unwrap(substitute(eq.rhs,subs)), ns.eqs.value)
+    ns = convert(NonlinearSystem, wilhelm_2009_model)
+    subs = Dict(Pair.(wilhelm_2009_model.ps.value, last.(p)))
+    new_eqs = map(eq -> ModelingToolkit.unwrap(substitute(eq.rhs, subs)), ns.eqs.value)
 end
 
 # ╔═╡ 40058a11-195e-4443-a946-6be9dbabd7e6
@@ -245,13 +254,13 @@ Consider the following, slightly modified model from the previous section. Try c
 
 # ╔═╡ 580f6825-2f27-4187-a5c3-087479941bc4
 begin
-	wilhelm_2009_moddified_model = @reaction_network begin
-		0.1, 0 --> X
-	    k1, Y --> 2X
-	    k2, 2X --> X + Y
-	    k3, X + Y --> Y
-	    k4, X --> 0
-	end k1 k2 k3 k4
+    wilhelm_2009_moddified_model = @reaction_network begin
+        0.1, 0 --> X
+        k1, Y --> 2X
+        k2, 2X --> X + Y
+        k3, X + Y --> Y
+        k4, X --> 0
+    end k1 k2 k3 k4
 end;
 
 # ╔═╡ 92789d15-12a1-4045-8ca0-c77d1e7f457b

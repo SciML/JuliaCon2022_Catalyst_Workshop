@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, DifferentialEquations, Plots
+    using Catalyst, DifferentialEquations, Plots
 end
 
 # ╔═╡ b67e5b7f-3664-4ae2-bf0c-aaadb0165dca
@@ -94,17 +94,19 @@ md"
 # ╔═╡ 1ba42536-51bc-46b8-ad2d-b2be28f6966d
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ 4d5a20d1-aeea-42da-b924-01fcb06fafb0
@@ -120,7 +122,7 @@ A positive feedback loop where the single species (*X*) activates its own produc
 
 # ╔═╡ 5a6bfba4-d8c8-4d1d-9ea4-db1971361f31
 pos_feedback_model = @reaction_network begin
-    v0 + hill(i*X,v,K,n), ∅ → X
+    v0 + hill(i * X, v, K, n), ∅ → X
     d, X → ∅
 end i v0 v K n d
 
@@ -131,20 +133,20 @@ md"
 
 # ╔═╡ 9a10ab17-cea5-4d68-88da-2d5d0568c5c6
 begin
-	u0 = [:X => 5.0]
-	tspan = (0.0,100.0)
-	p = [:i => 1.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
-	oprob = ODEProblem(pos_feedback_model,u0,tspan,p)
+    u0 = [:X => 5.0]
+    tspan = (0.0, 100.0)
+    p = [:i => 1.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
+    oprob = ODEProblem(pos_feedback_model, u0, tspan, p)
 end;
 
 # ╔═╡ 5dbd36aa-5659-4e2c-b642-c8782fbff67d
 begin
-	osol = solve(oprob,Rosenbrock23())
-	plot(osol)
+    osol = solve(oprob, Rosenbrock23())
+    plot(osol)
 end
 
 # ╔═╡ 7ed8c738-2441-4198-a4ce-abe96bdf8b2a
-plot(osol,xguide="Time",yguide="Concentration",framestyle=:box,label="",lw=4)
+plot(osol, xguide = "Time", yguide = "Concentration", framestyle = :box, label = "", lw = 4)
 
 # ╔═╡ 93abfa3f-b178-433c-9a9f-3febe20b7457
 md"
@@ -153,9 +155,9 @@ md"
 
 # ╔═╡ 370b4310-618e-45ac-9c03-75e142ddcccd
 begin
-	sprob = SDEProblem(pos_feedback_model,u0,tspan,p);
-	ssol = solve(sprob,ImplicitEM())
-	plot(ssol)
+    sprob = SDEProblem(pos_feedback_model, u0, tspan, p)
+    ssol = solve(sprob, ImplicitEM())
+    plot(ssol)
 end
 
 # ╔═╡ d866c9ed-c8e8-4ec3-b009-87e556907358
@@ -166,16 +168,16 @@ Under certain circumstances, it might be desirable to tune the amount of noise u
 
 # ╔═╡ 44ff366b-adb3-427d-a71f-22e88b5ef02d
 pos_feedback_model_noise_scaling = @reaction_network begin
-    v0 + hill(i*X,v,K,n), ∅ → X
+    v0 + hill(i * X, v, K, n), ∅ → X
     d, X → ∅
 end i v0 v K n d η;
 
 # ╔═╡ 78135a37-8ddd-4281-a1d7-2fea75286383
 begin
-	p_ns = [p; :η => 0.1]
-	sprob_ns = SDEProblem(pos_feedback_model_noise_scaling,u0,tspan,p_ns;noise_scaling=(@parameters η)[1]);
-	ssol_ns = solve(sprob_ns,ImplicitEM());
-	plot(ssol_ns)
+    p_ns = [p; :η => 0.1]
+    sprob_ns = SDEProblem(pos_feedback_model_noise_scaling, u0, tspan, p_ns; noise_scaling = (@parameters η)[1])
+    ssol_ns = solve(sprob_ns, ImplicitEM())
+    plot(ssol_ns)
 end
 
 # ╔═╡ 9dcfeb31-61ca-4a36-93bf-e20e9c852811
@@ -186,10 +188,10 @@ Here, adaptive time-stepping can be turned off.
 
 # ╔═╡ 84f026d3-927d-435d-a8fb-7984412b486a
 let
-	p_ns = [p; :η => 6.0]
-	sprob_ns = SDEProblem(pos_feedback_model_noise_scaling,u0,tspan,p_ns;noise_scaling=(@parameters η)[1]);
-	ssol_ns = solve(sprob_ns,ImplicitEM());
-	plot(ssol_ns)
+    p_ns = [p; :η => 6.0]
+    sprob_ns = SDEProblem(pos_feedback_model_noise_scaling, u0, tspan, p_ns; noise_scaling = (@parameters η)[1])
+    ssol_ns = solve(sprob_ns, ImplicitEM())
+    plot(ssol_ns)
 end
 
 # ╔═╡ 8c2baa2d-67f7-49ec-9ce4-688b3bf88a08
@@ -199,10 +201,10 @@ Here, \"adaptive=false\" turns of adaptiveness, and \"dt=0.001\" sets the time s
 
 # ╔═╡ 9f536f9d-15b1-4499-be35-debf0048ed5c
 let
-	p_ns = [p; :η => 6.0]
-	sprob_ns = SDEProblem(pos_feedback_model_noise_scaling,u0,tspan,p_ns;noise_scaling=(@parameters η)[1]);
-	ssol_ns = solve(sprob_ns,ImplicitEM();adaptive=false,dt=0.001);
-	plot(ssol_ns)
+    p_ns = [p; :η => 6.0]
+    sprob_ns = SDEProblem(pos_feedback_model_noise_scaling, u0, tspan, p_ns; noise_scaling = (@parameters η)[1])
+    ssol_ns = solve(sprob_ns, ImplicitEM(); adaptive = false, dt = 0.001)
+    plot(ssol_ns)
 end
 
 # ╔═╡ 2a5584f3-4a33-439f-a0de-6ddb767937cf
@@ -212,10 +214,10 @@ For low dt, it might make sense to save the solution less frequently (by using t
 
 # ╔═╡ 1e37edbb-58e9-4f79-95ab-3dab20b9a586
 let
-	p_ns = [p; :η => 6.0]
-	sprob_ns = SDEProblem(pos_feedback_model_noise_scaling,u0,tspan,p_ns;noise_scaling=(@parameters η)[1]);
-	ssol_ns = solve(sprob_ns,ImplicitEM();adaptive=false,dt=0.001,saveat=0.1);
-	plot(ssol_ns)
+    p_ns = [p; :η => 6.0]
+    sprob_ns = SDEProblem(pos_feedback_model_noise_scaling, u0, tspan, p_ns; noise_scaling = (@parameters η)[1])
+    ssol_ns = solve(sprob_ns, ImplicitEM(); adaptive = false, dt = 0.001, saveat = 0.1)
+    plot(ssol_ns)
 end
 
 # ╔═╡ 83ec221d-5ed0-4616-bf26-4e17af26cfe4
@@ -225,16 +227,16 @@ md"
 
 # ╔═╡ c4757730-4cff-415c-991d-b6e917ac6288
 begin
-	affect!(integrator) = integrator.p[1]=3.0
-	activation_cb = PresetTimeCallback([20.0],affect!)
+    affect!(integrator) = integrator.p[1] = 3.0
+    activation_cb = PresetTimeCallback([20.0], affect!)
 end;
 
 # ╔═╡ 2235f660-7601-4e04-ab4d-77e33c09ff22
 begin
-	p_activation = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
-	sprob_activation = SDEProblem(pos_feedback_model,u0,tspan,deepcopy(p_activation))
-	ssol_activation = solve(sprob_activation,ImplicitEM(),callback=activation_cb,adaptive=false,dt=0.0001)
-	plot(ssol_activation)
+    p_activation = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
+    sprob_activation = SDEProblem(pos_feedback_model, u0, tspan, deepcopy(p_activation))
+    ssol_activation = solve(sprob_activation, ImplicitEM(), callback = activation_cb, adaptive = false, dt = 0.0001)
+    plot(ssol_activation)
 end
 
 # ╔═╡ 70a154c3-a3d6-4082-9a53-e3869943af5e
@@ -244,14 +246,14 @@ md"
 
 # ╔═╡ 2c51fc8d-083b-45a0-a663-26a269f3cc07
 let
-	p_activation = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
-	sprob_activation = SDEProblem(pos_feedback_model,u0,tspan,deepcopy(p_activation))
-	
-	prob_func(prob,i,repeat) = prob
-	eprob = EnsembleProblem(sprob_activation,prob_func=prob_func,safetycopy=false);
-	
-	esol = solve(eprob,ImplicitEM();trajectories=15,callback=activation_cb)
-	plot(esol)
+    p_activation = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
+    sprob_activation = SDEProblem(pos_feedback_model, u0, tspan, deepcopy(p_activation))
+
+    prob_func(prob, i, repeat) = prob
+    eprob = EnsembleProblem(sprob_activation, prob_func = prob_func, safetycopy = false)
+
+    esol = solve(eprob, ImplicitEM(); trajectories = 15, callback = activation_cb)
+    plot(esol)
 end
 
 # ╔═╡ a2094021-cbfe-4d8f-8559-a37955c2eb34
@@ -261,12 +263,12 @@ This looks good, but the callback changes the parameter value, which is then use
 
 # ╔═╡ f6b373a5-888e-4fec-8872-b7dcdf5558b0
 esol = let
-	p_activation_en = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
-	sprob_activation = SDEProblem(pos_feedback_model,u0,tspan,deepcopy(p_activation))
-	
-	prob_func(prob,i,repeat) = remake(prob,p=deepcopy(sprob_activation.p));
-	eprob = EnsembleProblem(sprob_activation,prob_func=prob_func,safetycopy=false);
-	solve(eprob,ImplicitEM();trajectories=15,callback=activation_cb)
+    p_activation_en = [:i => 0.0, :v0 => 1.0, :v => 10.0, :K => 100.0, :n => 2, :d => 0.1]
+    sprob_activation = SDEProblem(pos_feedback_model, u0, tspan, deepcopy(p_activation))
+
+    prob_func(prob, i, repeat) = remake(prob, p = deepcopy(sprob_activation.p))
+    eprob = EnsembleProblem(sprob_activation, prob_func = prob_func, safetycopy = false)
+    solve(eprob, ImplicitEM(); trajectories = 15, callback = activation_cb)
 end;
 
 # ╔═╡ bad36227-f32d-4398-a5a1-62e92bf3105f
@@ -278,7 +280,7 @@ The \"linealpha\" option can be useful when plotting a large number of solutions
 "
 
 # ╔═╡ 4ffba508-491f-4065-a7b7-73dcd1f80ab5
-plot(esol,linealpha=0.6)
+plot(esol, linealpha = 0.6)
 
 # ╔═╡ 4c1e82c2-717c-45e1-8c0d-1ccaf0fa2f19
 md"
@@ -286,7 +288,7 @@ A subset of the solutions can be plotted using the \"idxs\" argument:
 "
 
 # ╔═╡ f126a0a3-8c4d-4dee-9fec-b98f54aa860b
-plot(esol,linealpha=0.6,idxs=1:5)
+plot(esol, linealpha = 0.6, idxs = 1:5)
 
 # ╔═╡ 0e10eabc-81dd-4187-9d6c-8491307a95e1
 md"
@@ -300,12 +302,12 @@ We simulate a simple two-state model:
 
 # ╔═╡ 573950d4-a321-420b-b425-d4a90c56185f
 sol = let
-	two_state_model = @reaction_network begin
-		(k1,k2), X1 <--> X2
-	end k1 k2
-	sprob = SDEProblem(two_state_model,[:X1 => 5.0, :X2 => 5.0],(0.,10.0),[:k1 => 1.0, :k2 => 0.5])
-	solve(sprob,ImplicitEM())
-end;	
+    two_state_model = @reaction_network begin
+        (k1, k2), X1 <--> X2
+    end k1 k2
+    sprob = SDEProblem(two_state_model, [:X1 => 5.0, :X2 => 5.0], (0.0, 10.0), [:k1 => 1.0, :k2 => 0.5])
+    solve(sprob, ImplicitEM())
+end;
 
 # ╔═╡ d0cd5b36-6849-45c9-8122-3f5a63ba22f7
 plot(sol)
@@ -316,7 +318,7 @@ One can select which variables to plot using the \"vars\" argument.
 "
 
 # ╔═╡ 28be06f5-b60b-41b8-a5ad-6deb69b9fd13
-plot(sol,vars=[2])
+plot(sol, vars = [2])
 
 # ╔═╡ d42dda26-f043-4ba0-9276-80e0b2bcf20c
 md"
@@ -349,15 +351,15 @@ For quick simulations, this is not a big concern, but can be for larger ones.
 
 # ╔═╡ 9a531c2e-474c-425c-9757-ed3b77c2388a
 begin
-	brusselator_model = @reaction_network begin
-	    A, ∅ → X
-	    1, 2X + Y → 3X
-	    B, X → Y
-	    1, X → ∅
-	end A B;
-	u0_b = [:X => 5.0, :Y => 0.5]
-	tspan_b = (0.,200000.0)
-	p_b = [:A => 1.0, :B =>3.0]
+    brusselator_model = @reaction_network begin
+        A, ∅ → X
+        1, 2X + Y → 3X
+        B, X → Y
+        1, X → ∅
+    end A B
+    u0_b = [:X => 5.0, :Y => 0.5]
+    tspan_b = (0.0, 200000.0)
+    p_b = [:A => 1.0, :B => 3.0]
 end
 
 # ╔═╡ 346a8fe9-75e0-448f-809d-ab54e63f681e
@@ -367,8 +369,8 @@ Simulation not using the Jacobian:
 
 # ╔═╡ ba19a7e7-8c99-477f-bdf0-f0c3cfcea605
 let
-	oprob = ODEProblem(brusselator_model,u0_b,tspan_b,p_b)
-	@time solve(oprob)
+    oprob = ODEProblem(brusselator_model, u0_b, tspan_b, p_b)
+    @time solve(oprob)
 end;
 
 # ╔═╡ c880916d-f3e2-40c4-809a-cef081e93b88
@@ -378,8 +380,8 @@ Simulation using the Jacobian:
 
 # ╔═╡ 6ce9d36b-b934-43be-a978-3bf4e759a1bc
 let
-	oprob = ODEProblem(brusselator_model,u0_b,tspan_b,p_b;jac=true)
-	@time solve(oprob)
+    oprob = ODEProblem(brusselator_model, u0_b, tspan_b, p_b; jac = true)
+    @time solve(oprob)
 end;
 
 # ╔═╡ 29e081a9-0df3-4522-aff0-bf062486ba9a
@@ -389,8 +391,8 @@ Simulation using the sparse Jacobian:
 
 # ╔═╡ 48d084d5-09a6-4c67-b95f-3840889a3db6
 let
-	oprob = ODEProblem(brusselator_model,u0_b,tspan_b,p_b;jac=true,sparse=true)
-	@time solve(oprob)
+    oprob = ODEProblem(brusselator_model, u0_b, tspan_b, p_b; jac = true, sparse = true)
+    @time solve(oprob)
 end;
 
 # ╔═╡ 6ff919f2-39f7-4cbd-a6d2-6e57ca3fc3bc
@@ -408,14 +410,14 @@ Next, for p1, p2, p3. Compare the effect of selecting these parameter sets to th
 
 # ╔═╡ 37ced29b-b58b-4e90-bf57-4ed9b39621a5
 begin
-	bd_model = @reaction_network begin
-		(p,d), 0 <--> X
-	end p d;
-	p1 = [10.0, 1.0]
-	p2 = 10*[10.0, 1.0]
-	p3 = 100*[10.0, 1.0]
-	p4 = [1.0, 1.0]
-	p5 = 10*[1.0, 1.0]
+    bd_model = @reaction_network begin
+        (p, d), 0 <--> X
+    end p d
+    p1 = [10.0, 1.0]
+    p2 = 10 * [10.0, 1.0]
+    p3 = 100 * [10.0, 1.0]
+    p4 = [1.0, 1.0]
+    p5 = 10 * [1.0, 1.0]
 end
 
 # ╔═╡ Cell order:

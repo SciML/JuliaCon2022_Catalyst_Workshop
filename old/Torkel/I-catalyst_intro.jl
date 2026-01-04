@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, DifferentialEquations, Plots
+    using Catalyst, DifferentialEquations, Plots
 end
 
 # ╔═╡ 0794bd0a-80cd-476d-89dc-5cf9a8b3c289
@@ -94,17 +94,19 @@ md"
 # ╔═╡ c49d8402-0e67-41b6-b93d-a0e24a3902d1
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ 04b67692-4431-4508-bb79-31aa82065c8c
@@ -122,8 +124,8 @@ md"
 
 # ╔═╡ 8b5d701d-40ed-4699-b4fc-43521123d4ea
 bd_model = @reaction_network begin
-	b, 0 --> X
-	d, X --> 0
+    b, 0 --> X
+    d, X --> 0
 end b d
 
 # ╔═╡ fcdc330d-a027-40cc-9349-e8062891754c
@@ -133,16 +135,16 @@ md"
 
 # ╔═╡ 242235c2-e77a-45a1-ad53-95d948cd30d8
 begin
-	u0 = [:X => 1.0];
-	tspan = (0.0,50.0)
-	p = [:b => 1.0, :d => 0.1]
-	oprob = ODEProblem(bd_model,u0,tspan,p)
+    u0 = [:X => 1.0]
+    tspan = (0.0, 50.0)
+    p = [:b => 1.0, :d => 0.1]
+    oprob = ODEProblem(bd_model, u0, tspan, p)
 end;
 
 # ╔═╡ 790ed9f4-84ff-4284-a4a0-21c5b76cb4ea
 begin
-	osol = solve(oprob)
-	plot(osol)
+    osol = solve(oprob)
+    plot(osol)
 end
 
 # ╔═╡ f692fc4a-34c5-449b-818b-95f8a5ff9d07
@@ -152,9 +154,9 @@ md"
 
 # ╔═╡ 74f2b081-bded-4632-bb4f-265c78f8ff85
 begin
-	sprob = SDEProblem(bd_model,u0,tspan,p);
-	ssol = solve(sprob)
-	plot(ssol)
+    sprob = SDEProblem(bd_model, u0, tspan, p)
+    ssol = solve(sprob)
+    plot(ssol)
 end
 
 # ╔═╡ ea3a847b-32ab-46fd-b02c-8dff06e3eb66
@@ -164,15 +166,15 @@ md"
 
 # ╔═╡ 6d0e3d7f-a028-4f21-acbc-d22ccdcc29af
 begin
-	u0_gill = [:X => 1];
-	dprob = DiscreteProblem(bd_model,u0_gill,tspan,p)
-	jprob = JumpProblem(bd_model,dprob,Direct());
+    u0_gill = [:X => 1]
+    dprob = DiscreteProblem(bd_model, u0_gill, tspan, p)
+    jprob = JumpProblem(bd_model, dprob, Direct())
 end;
 
 # ╔═╡ 5c66f199-1c9e-41c8-93cb-f49c04e827c5
 begin
-	gsol = solve(jprob,SSAStepper())
-	plot(gsol)
+    gsol = solve(jprob, SSAStepper())
+    plot(gsol)
 end
 
 # ╔═╡ Cell order:

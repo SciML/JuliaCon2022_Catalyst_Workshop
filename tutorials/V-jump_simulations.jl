@@ -12,13 +12,13 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, ModelingToolkit, DifferentialEquations, Plots, PlutoUI, DiffEqCallbacks
+    using Catalyst, ModelingToolkit, DifferentialEquations, Plots, PlutoUI, DiffEqCallbacks
 end
 
 # ╔═╡ dada26bd-9564-4957-ba26-0c351ad59ecc
-begin 
-	using DiffEqProblemLibrary.JumpProblemLibrary
-	JumpProblemLibrary.importjumpproblems()
+begin
+    using DiffEqProblemLibrary.JumpProblemLibrary
+    JumpProblemLibrary.importjumpproblems()
 end;
 
 # ╔═╡ ceeace90-0b74-11ed-028d-316c8b46be70
@@ -59,17 +59,19 @@ md"
 # ╔═╡ 54a6ebb2-dcd3-4b2a-a376-e2eaa3dd7775
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ 698fcefd-bd81-4132-9707-aef8088e552f
@@ -87,10 +89,10 @@ As an illustrating example, let's work with a toggle switch model for two genes 
 
 # ╔═╡ fd3fb9d2-8960-48c9-be43-4a05d7fdaf5f
 toggleswitch = @reaction_network toggleswitch begin
-    hillr(P₂,α,K,n), ∅ --> m₁
-    hillr(P₁,α,K,n), ∅ --> m₂
-    (δ,γ), m₁ ↔ ∅
-    (δ,γ), m₂ ↔ ∅
+    hillr(P₂, α, K, n), ∅ --> m₁
+    hillr(P₁, α, K, n), ∅ --> m₂
+    (δ, γ), m₁ ↔ ∅
+    (δ, γ), m₂ ↔ ∅
     β, m₁ --> m₁ + P₁
     β, m₂ --> m₂ + P₂
     μ, P₁ --> ∅
@@ -98,15 +100,15 @@ toggleswitch = @reaction_network toggleswitch begin
 end α K n δ γ β μ
 
 # ╔═╡ 2498ecb8-e8a0-46cd-bdea-86e60745ac10
-begin 
-	p = [:α => .15, :K => 40, :n => 2, :δ => log(2)/120, :γ => 5e-3, :β => 20*log(2)/120, :μ => log(2)/60]	
-	u₀ = [:m₁ => 0, :m₂ => 0, :P₁ => 0, :P₂ => 0]
-	tspan = (0., 100.)
+begin
+    p = [:α => 0.15, :K => 40, :n => 2, :δ => log(2) / 120, :γ => 5.0e-3, :β => 20 * log(2) / 120, :μ => log(2) / 60]
+    u₀ = [:m₁ => 0, :m₂ => 0, :P₁ => 0, :P₂ => 0]
+    tspan = (0.0, 100.0)
 
-	dprob = DiscreteProblem(toggleswitch, u₀, tspan, p)
-	jprob = JumpProblem(toggleswitch, dprob, Direct())   
-	sol = solve(jprob, SSAStepper()) 
-	plot(sol, legend=:outerright)
+    dprob = DiscreteProblem(toggleswitch, u₀, tspan, p)
+    jprob = JumpProblem(toggleswitch, dprob, Direct())
+    sol = solve(jprob, SSAStepper())
+    plot(sol, legend = :outerright)
 end
 
 # ╔═╡ d81f817c-ac77-4a3b-84fd-71f0eed41b3f
@@ -126,17 +128,17 @@ Notice, we aren't really seeing the state switching of the toggle switch above -
 
 # ╔═╡ 75d98830-cf97-495a-a364-cc4c275e4d80
 let
-	
-	tspan = (0.0, 100000.0)
-	dprob = DiscreteProblem(toggleswitch, u₀, tspan, p)
 
-	# turn off saving the state before and after every jump	
-	jprob = JumpProblem(toggleswitch, dprob, Direct(); save_positions=(false,false))
+    tspan = (0.0, 100000.0)
+    dprob = DiscreteProblem(toggleswitch, u₀, tspan, p)
 
-	# save the solution every 10.0 seconds only
-	sol = solve(jprob, SSAStepper(), saveat=10.0)
-	
-	plot(sol, legend=:outerright)
+    # turn off saving the state before and after every jump
+    jprob = JumpProblem(toggleswitch, dprob, Direct(); save_positions = (false, false))
+
+    # save the solution every 10.0 seconds only
+    sol = solve(jprob, SSAStepper(), saveat = 10.0)
+
+    plot(sol, legend = :outerright)
 end
 
 # ╔═╡ 67f08ff1-ec51-4df3-b351-c02fbc4e91e8
@@ -249,36 +251,36 @@ negexpress
 
 # ╔═╡ 39943d98-4711-4a37-aa7b-2823dbcc5595
 firsttimeprob, firsttimecb = let
-	# set some initial conditions for our system
-	setdefaults!(negexpress, [:DNA => 1, :DNAR => 0, :P => 0, :mRNA => 0])
+    # set some initial conditions for our system
+    setdefaults!(negexpress, [:DNA => 1, :DNAR => 0, :P => 0, :mRNA => 0])
 
-	# convert to a JumpSystem
-	jsys = convert(JumpSystem, negexpress)
-	
-	# symbolic variables we'll use
-	@unpack DNA, DNAR = jsys
+    # convert to a JumpSystem
+    jsys = convert(JumpSystem, negexpress)
 
-	# get its integer index within the solution vector, u
-	DNARidx = findfirst(isequal(DNAR), states(jsys))
+    # symbolic variables we'll use
+    @unpack DNA, DNAR = jsys
 
-	# the condition function to stop a simulation
-	function first_DNAR_cond(u, t, integrator; DNARidx=DNARidx)
-		u[DNARidx] == 1
-	end
+    # get its integer index within the solution vector, u
+    DNARidx = findfirst(isequal(DNAR), states(jsys))
 
-	# an affect! to stop the simulation when the condition is true
-	function stop_sim(integrator)
-		savevalues!(integrator, true)
-		terminate!(integrator)
-		nothing
-	end
+    # the condition function to stop a simulation
+    function first_DNAR_cond(u, t, integrator; DNARidx = DNARidx)
+        return u[DNARidx] == 1
+    end
 
-	# create the callback
-	cb = DiscreteCallback(first_DNAR_cond, stop_sim)
-	
-	dprob = DiscreteProblem(jsys, [], (0.0, 1000.0), prob_jump_dnarepressor.rates)
-	jprob = JumpProblem(jsys, dprob, Direct())
-	jprob,cb
+    # an affect! to stop the simulation when the condition is true
+    function stop_sim(integrator)
+        savevalues!(integrator, true)
+        terminate!(integrator)
+        return nothing
+    end
+
+    # create the callback
+    cb = DiscreteCallback(first_DNAR_cond, stop_sim)
+
+    dprob = DiscreteProblem(jsys, [], (0.0, 1000.0), prob_jump_dnarepressor.rates)
+    jprob = JumpProblem(jsys, dprob, Direct())
+    jprob, cb
 end
 
 # ╔═╡ fb48eabe-ea6f-4746-8ec5-ab55111a8ead
@@ -292,19 +294,19 @@ md"Let's look at the distribution of such exit times:"
 
 # ╔═╡ 44db3690-450f-4fee-a99f-54ad8a352a1f
 function getexittimes(jprob, cb, N)
-	times = zeros(N)
-	for i in eachindex(times)
-		sol = solve(jprob, SSAStepper(); save_end = false, callback = cb)
-		times[i] = sol.t[end]
-	end
-	times
+    times = zeros(N)
+    for i in eachindex(times)
+        sol = solve(jprob, SSAStepper(); save_end = false, callback = cb)
+        times[i] = sol.t[end]
+    end
+    return times
 end
 
 # ╔═╡ a6cd74e7-f1a6-4f8e-9514-bdeb7e0fc7b0
 times = getexittimes(firsttimeprob, firsttimecb, 100000)
 
 # ╔═╡ 6f4eb0ad-7253-4ed4-8781-004f77c31ed4
-histogram(times; normalize=true, bins=100, legend=nothing, xlabel="exit time", ylabel="PDF(exit time)")
+histogram(times; normalize = true, bins = 100, legend = nothing, xlabel = "exit time", ylabel = "PDF(exit time)")
 
 # ╔═╡ cd1cbbd8-3ab5-4827-8ea8-4b2112a962c6
 md"## _*What about if we want to change a state or parameters?*_
@@ -316,40 +318,40 @@ As a simple example, let's suppose we have cancerous cells that are produced at 
 "
 
 # ╔═╡ 692d54d0-fba1-41c0-8a6c-87098f354a83
-let 
-	birthdeath = @reaction_network begin
-		b, ∅ --> N
-		d, N --> ∅
-	end b d
+let
+    birthdeath = @reaction_network begin
+        b, ∅ --> N
+        d, N --> ∅
+    end b d
 
-	jsys = convert(JumpSystem, birthdeath)
-	
-	# get the parameter's integer index in jsys
-	@unpack b = jsys
-	bidx = findfirst(isequal(b), parameters(jsys))
+    jsys = convert(JumpSystem, birthdeath)
 
-	# set up initial condition and parameters for jsys
-	p = symmap_to_varmap(jsys, [:b => 2000.0, :d => 5.0])
-	u₀ = symmap_to_varmap(jsys, [:N => 20])
+    # get the parameter's integer index in jsys
+    @unpack b = jsys
+    bidx = findfirst(isequal(b), parameters(jsys))
 
-	# we'll use a PresetTimeCallback to apply five treatments
-	treatment_times = collect(range(4.0, 12.0, step=2.0))
-	function treatment_affect!(integrator)
-		integrator.p[bidx] *= .5
-		reset_aggregated_jumps!(integrator)
-		nothing
-	end
-	cb = PresetTimeCallback(treatment_times, treatment_affect!)
+    # set up initial condition and parameters for jsys
+    p = symmap_to_varmap(jsys, [:b => 2000.0, :d => 5.0])
+    u₀ = symmap_to_varmap(jsys, [:N => 20])
 
-	dprob = DiscreteProblem(jsys, u₀, (0.0, 20.0), p)
-	jprob = JumpProblem(jsys, dprob, Direct())
-	sol = solve(jprob, SSAStepper())
-	p1 = plot(sol, title="no treatment")
-	
-	sol = solve(jprob, SSAStepper(); callback = cb)
-	p2 = plot(sol, title="with treatment")
-	scatter!(p2, treatment_times, sol(treatment_times; idxs=jsys.N), label="treatment times")
-	plot(p1,p2, layout=(2,1))
+    # we'll use a PresetTimeCallback to apply five treatments
+    treatment_times = collect(range(4.0, 12.0, step = 2.0))
+    function treatment_affect!(integrator)
+        integrator.p[bidx] *= 0.5
+        reset_aggregated_jumps!(integrator)
+        return nothing
+    end
+    cb = PresetTimeCallback(treatment_times, treatment_affect!)
+
+    dprob = DiscreteProblem(jsys, u₀, (0.0, 20.0), p)
+    jprob = JumpProblem(jsys, dprob, Direct())
+    sol = solve(jprob, SSAStepper())
+    p1 = plot(sol, title = "no treatment")
+
+    sol = solve(jprob, SSAStepper(); callback = cb)
+    p2 = plot(sol, title = "with treatment")
+    scatter!(p2, treatment_times, sol(treatment_times; idxs = jsys.N), label = "treatment times")
+    plot(p1, p2, layout = (2, 1))
 end
 
 # ╔═╡ Cell order:

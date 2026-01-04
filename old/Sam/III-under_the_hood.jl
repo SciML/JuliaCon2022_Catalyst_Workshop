@@ -12,7 +12,7 @@ begin
     # instantiate, i.e. make sure that all packages are downloaded
     Pkg.instantiate()
 
-	using Catalyst, ModelingToolkit, DifferentialEquations, Plots, StochasticDiffEq, JumpProcesses, OrdinaryDiffEq
+    using Catalyst, ModelingToolkit, DifferentialEquations, Plots, StochasticDiffEq, JumpProcesses, OrdinaryDiffEq
 end
 
 # ╔═╡ 47323c44-09fe-11ed-0e8c-1b3df7e3b610
@@ -53,17 +53,19 @@ md"
 # ╔═╡ f5188c47-4c58-46a6-8e93-2b9b7b5d575a
 # plot defaults
 begin
-	_fsz = 12
-	_tsz = 12
-	default(size=(800,400), 
-			xtickfontsize=_tsz,
-			ytickfontsize=_tsz,
-		    titlefontsize=_fsz,
-	     	xguidefontsize=_fsz, 
-		    yguidefontsize=_fsz,
-		    legendfontsize=_fsz,
-	        margin=5Plots.mm,
-	        lw=2);
+    _fsz = 12
+    _tsz = 12
+    default(
+        size = (800, 400),
+        xtickfontsize = _tsz,
+        ytickfontsize = _tsz,
+        titlefontsize = _fsz,
+        xguidefontsize = _fsz,
+        yguidefontsize = _fsz,
+        legendfontsize = _fsz,
+        margin = 5Plots.mm,
+        lw = 2
+    )
 end
 
 # ╔═╡ 1e81937b-b71d-48a7-bdce-1a3f612c35be
@@ -120,7 +122,7 @@ An example of an ODESystem:
 
 # ╔═╡ 0d85b799-20b3-47d3-a760-6f44e9aca2e8
 rn = @reaction_network begin
-	k, 2*X + 3*Y --> 4Z
+    k, 2 * X + 3 * Y --> 4Z
 end k
 
 # ╔═╡ 0f975934-cfd2-4272-9f52-5f57815540f5
@@ -183,9 +185,9 @@ Let's check this by solving and plotting them:"
 
 # ╔═╡ abd7d4db-0be2-436f-9532-50891c14c0ce
 let
-	sol = solve(oprob, Tsit5())
-	sol2 = solve(oprob2, Tsit5())
-	plot(plot(sol, title="oprob", legend=:right), plot(sol2, title="oprob2", legend=:right))
+    sol = solve(oprob, Tsit5())
+    sol2 = solve(oprob2, Tsit5())
+    plot(plot(sol, title = "oprob", legend = :right), plot(sol2, title = "oprob2", legend = :right))
 end
 
 # ╔═╡ 96047157-4d4c-429d-82a1-679e0d9872e6
@@ -223,9 +225,9 @@ oprob2_nocr = ODEProblem(osys_nocr, u₀MT, tspan, pMT);
 
 # ╔═╡ 0506a612-0cff-429e-9a80-5ff7b770637f
 let
-	sol = solve(oprob_nocr, Tsit5())
-	sol2 = solve(oprob2_nocr, Tsit5())
-	plot(plot(sol, title="oprob_nocr", legend=:right), plot(sol2, title="oprob2_nocr", legend=:right))
+    sol = solve(oprob_nocr, Tsit5())
+    sol2 = solve(oprob2_nocr, Tsit5())
+    plot(plot(sol, title = "oprob_nocr", legend = :right), plot(sol2, title = "oprob2_nocr", legend = :right))
 end
 
 # ╔═╡ 57588fcd-a0c5-4be9-9687-56bdd15a6d35
